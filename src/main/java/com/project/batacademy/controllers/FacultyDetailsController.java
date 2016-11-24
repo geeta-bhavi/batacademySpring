@@ -48,16 +48,14 @@ public class FacultyDetailsController {
 				logger.info("The response code is: " + responseCode);
 				if (responseCode == 200) {
 					faculty = response.readEntity(Faculty.class);
+					/* if president signed in, then go to president details page */
+	                if (idToLookup == 1) {
+	                	modelView = new ModelAndView("presidentDetails");
+	                } else {
+	                	modelView = new ModelAndView("facultyDetails");
+	                }
+					modelView.addObject("faculty", faculty);
 				}
-				
-				/* if president signed in, then go to president details page */
-                if (idToLookup == 1) {
-                	modelView = new ModelAndView("presidentDetails");
-                } else {
-                	modelView = new ModelAndView("facultyDetails");
-                }
-				modelView.addObject("faculty", faculty);
-
 			}
 		}
 

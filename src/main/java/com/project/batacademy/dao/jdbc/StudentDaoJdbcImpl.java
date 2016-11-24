@@ -44,7 +44,7 @@ public class StudentDaoJdbcImpl implements StudentDao {
 	
 	public boolean authenticateStudent(int userId, String pwd) throws Exception {
 		try {
-			String sql = "select * from student where studentId=:studentId and password =:password";
+			String sql = "select studentId, firstName, lastName, gender, phone, cgpa, registered from student where studentId=:studentId and password =:password";
 			MapSqlParameterSource params = new MapSqlParameterSource();
 			params.addValue("studentId", userId);
 			params.addValue("password", pwd);
@@ -59,7 +59,7 @@ public class StudentDaoJdbcImpl implements StudentDao {
 	public Student getStudentDetails(int studentId) throws Exception {
 		Student stud = null;
 		try {
-			String sql = "select * from student where studentId=:studentId";
+			String sql = "select studentId, firstName, lastName, gender, phone, cgpa, registered from student where studentId=:studentId";
 			MapSqlParameterSource params = new MapSqlParameterSource("studentId", studentId);
 			stud =  dbTemplate.queryForObject(sql, params, studentRowMapper);
 			return stud;

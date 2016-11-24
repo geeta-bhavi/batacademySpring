@@ -10,16 +10,19 @@ import com.project.batacademy.domain.Student;
 
 @Service("facultyServiceImpl")
 public class FacultyServiceImpl implements FacultyService {
-	
+
 	@Autowired
 	@Qualifier("facultyDaoJdbc")
 	private FacultyDao facultyDao;
 
 	@Override
 	public Faculty getFacultyDetails(int facultyId) {
-		Faculty faculty = null;
-		faculty = (Faculty) facultyDao.getFacultyDetails(facultyId);
-        return faculty;
+		try {
+			Faculty faculty = (Faculty) facultyDao.getFacultyDetails(facultyId);
+			return faculty;
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 }

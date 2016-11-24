@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.project.batacademy.domain.Faculty;
+import com.project.batacademy.exceptions.UnknownResourceException;
 import com.project.batacademy.services.FacultyService;
 
 @Path("/facultyrest")
@@ -26,15 +27,11 @@ public class FacultyRestHandler {
 	public Faculty getFaculty(@PathParam("id") int id) {
 		Faculty faculty = null;
 
-		faculty = lookupFaculty(id);
-
-		return faculty;
-	}
-
-	private Faculty lookupFaculty(int id) {
-		Faculty faculty;
-
 		faculty = facultyService.getFacultyDetails(id);
+		
+		if (faculty == null) {
+			throw new UnknownResourceException("Faculty id: " + id + " is invalid");
+		}
 
 		return faculty;
 	}

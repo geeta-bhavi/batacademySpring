@@ -41,7 +41,7 @@ public class FacultyDaoJdbcImpl implements FacultyDao {
 	public boolean authenticateFaculty(int userId, String pwd) throws Exception {
 
 		try {
-			String sql = "select * from faculty where facultyId=:facultyId and password =:password";
+			String sql = "select facultyId, firstName, lastname, gender, phone, designation, enable from faculty where facultyId=:facultyId and password =:password";
 			MapSqlParameterSource params = new MapSqlParameterSource();
 			params.addValue("facultyId", userId);
 			params.addValue("password", pwd);
@@ -57,7 +57,7 @@ public class FacultyDaoJdbcImpl implements FacultyDao {
 	public Faculty getFacultyDetails(int facultyId) {
 		Faculty faculty = null;
 		try {
-			String sql = "select * from faculty where facultyId=:facultyId";
+			String sql = "select facultyId, firstName, lastname, gender, phone, designation, enable from faculty where facultyId=:facultyId";
 			MapSqlParameterSource params = new MapSqlParameterSource("facultyId", facultyId);
 			faculty = dbTemplate.queryForObject(sql, params, facultyRowMapper);
 		} catch (EmptyResultDataAccessException e) {

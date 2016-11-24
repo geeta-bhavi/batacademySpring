@@ -20,7 +20,6 @@ public class StudentRowMapper implements RowMapper<Student> {
 		stud.setLastName(resultSet.getString("lastName"));
 		stud.setGender(resultSet.getString("gender"));
 		stud.setPhone(resultSet.getString("phone"));
-		stud.setPassword(resultSet.getString("password"));
 		stud.setRegistered(resultSet.getBoolean("registered"));
 		
 		

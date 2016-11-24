@@ -20,7 +20,6 @@ public class FacultyRowMapper implements RowMapper<Faculty> {
 		faculty.setLastName(resultSet.getString("lastName"));
 		faculty.setGender(resultSet.getString("gender"));
 		faculty.setPhone(resultSet.getString("phone"));
-		faculty.setPassword(resultSet.getString("password"));
 		faculty.setDesignation(resultSet.getString("designation"));
 		faculty.setEnable(resultSet.getBoolean("enable"));
 		
