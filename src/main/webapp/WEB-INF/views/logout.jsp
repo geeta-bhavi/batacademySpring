@@ -1,0 +1,1 @@
+<a href="#" id="logOut" onclick="logOut(event);">Log Out</a>
