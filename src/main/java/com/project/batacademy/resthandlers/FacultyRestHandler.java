@@ -1,5 +1,7 @@
 package com.project.batacademy.resthandlers;
 
+import java.util.List;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -9,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import com.project.batacademy.domain.Course;
 import com.project.batacademy.domain.Faculty;
 import com.project.batacademy.exceptions.UnknownResourceException;
 import com.project.batacademy.services.FacultyService;
@@ -34,6 +37,21 @@ public class FacultyRestHandler {
 		}
 
 		return faculty;
+	}
+	
+	@GET
+	@Path("/faculty/courses/{id}")
+	@Produces("application/xml, application/json")
+	public List<Course> getCoursestaughtByFaculty(@PathParam("id") int id) {
+		List<Course> listOfCourses = null;
+
+		listOfCourses = facultyService.getCoursesTaughtByFaculty(id);
+		
+		if (listOfCourses == null) {
+			throw new UnknownResourceException("Faculty id: " + id + " is invalid or the faculty isn't teaching any courses!");
+		}
+
+		return listOfCourses;
 	}
 
 }
