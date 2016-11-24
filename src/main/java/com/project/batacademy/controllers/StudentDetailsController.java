@@ -49,11 +49,9 @@ public class StudentDetailsController {
 				logger.info("The response code is: " + responseCode);
 				if (responseCode == 200) {
 					student = response.readEntity(Student.class);
+					modelView = new ModelAndView("studentDetails");
+					modelView.addObject("student", student);
 				}
-				
-				modelView = new ModelAndView("studentDetails");
-				modelView.addObject("student", student);
-
 			}
 		}
 

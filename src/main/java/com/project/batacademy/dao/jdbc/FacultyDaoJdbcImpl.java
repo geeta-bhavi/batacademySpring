@@ -38,20 +38,20 @@ public class FacultyDaoJdbcImpl implements FacultyDao {
 		jdbcInsert = new SimpleJdbcInsert(dataSource).withTableName("student").usingGeneratedKeyColumns("studentId");
 	}
 
-	public Faculty getFacultyDetails(int userId, String pwd) {
+	public boolean authenticateFaculty(int userId, String pwd) throws Exception {
 
-		Faculty faculty = null;
 		try {
 			String sql = "select * from faculty where facultyId=:facultyId and password =:password";
 			MapSqlParameterSource params = new MapSqlParameterSource();
 			params.addValue("facultyId", userId);
 			params.addValue("password", pwd);
-			faculty = dbTemplate.queryForObject(sql, params, facultyRowMapper);
-		} catch (EmptyResultDataAccessException e) {
-			logger.error("FacultyDaoJdbcImpl getFacultyDetails by id and pwd: " + e);
+			Faculty faculty = dbTemplate.queryForObject(sql, params, facultyRowMapper);
+			return true;
+		} catch (Exception e) {
+			logger.error("FacultyDaoJdbcImpl getFacultyDetails by id and pwd: " + e.getMessage());
+			throw e;
 		}
 
-		return faculty;
 	}
 
 	public Faculty getFacultyDetails(int facultyId) {

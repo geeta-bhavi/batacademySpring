@@ -31,16 +31,13 @@ public class StudentRestHandler {
 	public Student getStudent(@PathParam("id") int id) {
 		Student stud = null;
 
-		stud = lookupStudent(id);
+		stud = studentService.getStudentDetails(id);
+		
+		if (stud == null) {
+			throw new UnknownResourceException("Student id: " + id + " is invalid");
+		}
 
 		return stud;
 	}
 
-	private Student lookupStudent(int id) {
-		Student student;
-
-		student = studentService.getStudentDetails(id);
-
-		return student;
-	}
 }

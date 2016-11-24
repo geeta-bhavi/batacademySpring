@@ -4,7 +4,7 @@ import com.project.batacademy.domain.Student;
 
 public interface StudentDao {
 	
-	public Student getStudentDetails(int userId, String pwd);
-	public Student getStudentDetails(int studentId);
+	public boolean authenticateStudent(int userId, String pwd) throws Exception;
+	public Student getStudentDetails(int studentId) throws Exception;
 
 }

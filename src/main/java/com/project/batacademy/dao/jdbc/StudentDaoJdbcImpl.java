@@ -42,30 +42,32 @@ public class StudentDaoJdbcImpl implements StudentDao {
 	
 
 	
-	public Student getStudentDetails(int userId, String pwd) {
-		Student stud = null;
+	public boolean authenticateStudent(int userId, String pwd) throws Exception {
 		try {
 			String sql = "select * from student where studentId=:studentId and password =:password";
 			MapSqlParameterSource params = new MapSqlParameterSource();
 			params.addValue("studentId", userId);
 			params.addValue("password", pwd);
-			stud =  dbTemplate.queryForObject(sql, params, studentRowMapper);
-		} catch(EmptyResultDataAccessException e) {
-			logger.error("StudentDaoJdbcImpl getStudentDetails by id and pwd: "+ e);
+			Student stud =  dbTemplate.queryForObject(sql, params, studentRowMapper);
+			return true;
+		} catch(Exception e) {
+			logger.error("StudentDaoJdbcImpl getStudentDetails by id and pwd: "+ e.getMessage());
+			throw e;
 		}
-		return stud;
 	}
 	
-	public Student getStudentDetails(int studentId) {
+	public Student getStudentDetails(int studentId) throws Exception {
 		Student stud = null;
 		try {
 			String sql = "select * from student where studentId=:studentId";
 			MapSqlParameterSource params = new MapSqlParameterSource("studentId", studentId);
 			stud =  dbTemplate.queryForObject(sql, params, studentRowMapper);
-		} catch(EmptyResultDataAccessException e) {
-			logger.error("StudentDaoJdbcImpl getStudentDetails by id: "+ e);
+			return stud;
+		} catch(Exception e) {
+			logger.error("StudentDaoJdbcImpl getStudentDetails by id: "+ e.getMessage());
+			throw e;
 		}
-		return stud;
+		
 	}
 
 }

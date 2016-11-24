@@ -20,56 +20,56 @@ public class SignInController {
 	@Autowired
 	@Qualifier("authServiceImpl")
 	private AuthenticateService auth;
-	
-	
+
 	@RequestMapping(value = "/signin", method = RequestMethod.POST)
 	@ResponseBody
 	public String signIn(String id, String password, String userType, HttpSession session) {
-		
-		String userExists = "";
-		int userId = 0;
-		
 
-        if (id.length() != 0 && password.length() != 0) {
-            userId = Integer.parseInt(id);
-            
-            if (userType.equalsIgnoreCase("student")) {
-                userExists = auth.checkIfStudentExists(userId, password);
-            } else {
-                userExists = auth.checkIfFacultyExists(userId, password);
-            }
-        }
-        
-        logger.info("user exists: "+userExists);
-        
-        if (userExists.equalsIgnoreCase("student")) {
-            if (session != null) {
-            	/*if session exists, make other attribute as null */
-                session.setAttribute("facultyId", null);         
-            }
-            session.setAttribute("studentId", userId);
-            return "student";
-        } else if (userExists.equalsIgnoreCase("faculty")) {
-        	if (session != null) {
-            	/*if session exists, make other attribute as null */
-                session.setAttribute("studentId", null);         
-            }
-            session.setAttribute("facultyId", userId);
-            return "faculty";
-        } else {
-        
-        	return "error";
-        }
-		
+		boolean userExists = false;
+		int userId = 0;
+
+		if (id.length() != 0 && password.length() != 0) {
+			userId = Integer.parseInt(id);
+
+			if (userType.equalsIgnoreCase("student")) {
+				userExists = auth.checkIfStudentExists(userId, password);
+
+				if (userExists) {
+					if (session != null) {
+						/* if session exists, make other attribute as null */
+						session.setAttribute("facultyId", null);
+					}
+					session.setAttribute("studentId", userId);
+					return "student";
+				}
+
+			} else {
+				userExists = auth.checkIfFacultyExists(userId, password);
+
+				if (userExists) {
+					if (session != null) {
+						/* if session exists, make other attribute as null */
+						session.setAttribute("studentId", null);
+					}
+					session.setAttribute("facultyId", userId);
+					return "faculty";
+				}
+			}
+		}
+
+		logger.info("user exists: " + userExists);
+
+		return "error";
+
 	}
-	
+
 	@RequestMapping(value = "/signout", method = RequestMethod.POST)
 	@ResponseBody
 	public String signOut(HttpSession session) {
-		if(session != null) {
-            session.invalidate();
-        }
-		
+		if (session != null) {
+			session.invalidate();
+		}
+
 		return "success";
 	}
 

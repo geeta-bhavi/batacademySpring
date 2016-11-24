@@ -4,7 +4,7 @@ import com.project.batacademy.domain.Faculty;
 
 public interface FacultyDao {
 	
-	public Faculty getFacultyDetails(int userId, String pwd);
+	public boolean authenticateFaculty(int userId, String pwd) throws Exception;
 	public Faculty getFacultyDetails(int facultyId);
 
 

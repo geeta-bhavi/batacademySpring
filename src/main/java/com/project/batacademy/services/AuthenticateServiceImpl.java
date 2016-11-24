@@ -17,25 +17,31 @@ public class AuthenticateServiceImpl implements AuthenticateService {
 	@Autowired
 	@Qualifier("studentDaoJdbc")
 	private StudentDao studentDao;
-	
+
 	@Autowired
 	@Qualifier("facultyDaoJdbc")
 	private FacultyDao facultyDao;
 
-	public String checkIfStudentExists(int userId, String password) {
-		Student student = (Student) studentDao.getStudentDetails(userId, password);
-        if (student != null) {
-            return "student";
-        }
-        return "error";
+	public boolean checkIfStudentExists(int userId, String password) {
+		try {
+			boolean exists = studentDao.authenticateStudent(userId, password);
+			return exists;
+
+		} catch (Exception e) {
+
+			return false;
+		}
+
 	}
 
-	public String checkIfFacultyExists(int userId, String password) {
-		Faculty faculty = (Faculty) facultyDao.getFacultyDetails(userId, password);
-        if (faculty != null) {
-            return "faculty";
-        }
-        return "error";
+	public boolean checkIfFacultyExists(int userId, String password) {
+		try {
+			boolean exists = facultyDao.authenticateFaculty(userId, password);
+			return exists;
+		} catch(Exception e) {
+			return false;
+		}
+		
 	}
 
 }
