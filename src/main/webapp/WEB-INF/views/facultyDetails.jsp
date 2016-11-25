@@ -50,9 +50,49 @@
                                 <li><span class="batLabel">Course Name:</span><span class="info">${course.courseName}</li>
                             </c:forEach>
                         </ul>
+                    </div>   
+                </div>
+                
+                <div class="searchCont">
+                    <form id="searchById" class="large-6 medium-6 columns">
+                        <div>
+                            <input name="searchStudentId" type="number" id="searchStudentId" placeholder="Enter Student Id" max="9999" />
+                            <select name="searchCourseId" id="searchCourseId">
+                                <c:forEach var="course" items="${courses}">
+                                    <option value="${course.courseId}">${course.courseName}</option>
+                                </c:forEach>
+                            </select>
+                        </div>
+                        <div>
+                            <input type="submit" value="Submit" class="button secondary">
+                        </div>
+                        <div id="searchError"></div>
+                    </form>
+
+                    <div id="searchResults" class="hide large-12 medium-12 columns">
+                        <form id="updateActivity">
+                            <table class="courseTable" id="selectedCousesTable">
+                                <tr>
+                                    <th>Student Id</th>
+                                    <th>Course Id</th>
+                                    <th>Activity 1</th>
+                                    <th>Activity 2</th>
+                                    <th>Activity 3</th>
+                                </tr>
+                                <tr>
+                                    <td id="enterStudentId"></td>
+                                    <td id="enterCourseId"></td>
+                                    <td><input min="0" max="100" class="allowEdit" id="enterActivity1" type="number"></td>
+                                    <td><input min="0" max="100" class="allowEdit" id="enterActivity2" type="number"></td>
+                                    <td><input min="0" max="100" class="allowEdit" id="enterActivity3" type="number"></td>
+                                </tr>
+                            </table>
+
+                            <input type="submit" class="button secondary" id="updateActivityBtn" value="Confirm changes">
+                        </form>
                     </div>
 
-                    
+                    <div id="updatedResults" class="large-12 medium-12 columns"></div>
                 </div>
                 
 

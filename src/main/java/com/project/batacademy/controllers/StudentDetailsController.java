@@ -32,7 +32,6 @@ public class StudentDetailsController {
 	StudentService studentService;
 
 	@RequestMapping(value = "/studentDetailsController", method = RequestMethod.GET)
-	@ResponseBody
 	public ModelAndView studentDetails(HttpSession session) {
 		
 		ModelAndView modelView = new ModelAndView("home");

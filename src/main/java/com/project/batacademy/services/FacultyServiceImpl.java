@@ -6,10 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import com.project.batacademy.dao.ActivityDao;
 import com.project.batacademy.dao.CourseDao;
 import com.project.batacademy.dao.FacultyDao;
+import com.project.batacademy.dao.RegisteredCoursesDao;
+import com.project.batacademy.domain.Activity;
 import com.project.batacademy.domain.Course;
 import com.project.batacademy.domain.Faculty;
+import com.project.batacademy.domain.RegisteredCourses;
 
 @Service("facultyServiceImpl")
 public class FacultyServiceImpl implements FacultyService {
@@ -21,6 +25,11 @@ public class FacultyServiceImpl implements FacultyService {
 	@Autowired
 	@Qualifier("courseDaoJdbc")
 	private CourseDao courseDao;
+	
+	@Autowired
+	@Qualifier("activityDaoJdbc")
+	private ActivityDao activityDao;
+
 
 	@Override
 	public Faculty getFacultyDetails(int facultyId) {
@@ -39,6 +48,16 @@ public class FacultyServiceImpl implements FacultyService {
 			return listOfCourses;
 		} catch (Exception e) {
 			return null;
+		}
+	}
+
+	@Override
+	public int updateActivity(Activity activity, int facultyId) {
+		try {
+			int noOfRowsUpdated = activityDao.updateActivity(activity, facultyId);
+			return noOfRowsUpdated;
+		} catch (Exception e) {
+			return 0;
 		}
 	}
 

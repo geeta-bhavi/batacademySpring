@@ -242,15 +242,19 @@ $(function () {
 
             $.ajax({
                 method: "POST",
-                url: "../BatAcademy/FacultyDetailsController",
-                data: {task: "search", sid: sid, cid: cid}
+                url: "../batacademy/facultyDetailsController/search",
+                data: {sid: sid, cid: cid},
+                dataType: "json",
+                beforeSend: function( xhr ) {
+                    xhr.setRequestHeader('Accept', 'application/json');
+                  }
             }).done(function (data) {
                 hideLoadingScreen();
 
-                if (data.activities !== undefined) {
-                    var value = data.activities;
+                if (data.activity !== null) {
+                    var value = data.activity;
                     /* if course is not completed then only allow faculty to edit */
-                    var isCourseCompleted = value.courseCompleted;
+                    var isCourseCompleted = data.courseCompleted;
                     if (isCourseCompleted) {
                         $("#updateActivityBtn").hide();
                     } else {
@@ -262,9 +266,9 @@ $(function () {
                     });
                     $("#enterStudentId").html(sid);
                     $("#enterCourseId").html(cid);
-                    $("#enterActivity1").val(value.Activity1);
-                    $("#enterActivity2").val(value.Activity2);
-                    $("#enterActivity3").val(value.Activity3);
+                    $("#enterActivity1").val(value.a1);
+                    $("#enterActivity2").val(value.a2);
+                    $("#enterActivity3").val(value.a3);
 
                     $("#searchResults").removeClass("hide").addClass("show");
 
@@ -298,12 +302,23 @@ $(function () {
         var activity1 = $("#enterActivity1").val();
         var activity2 = $("#enterActivity2").val();
         var activity3 = $("#enterActivity3").val();
-
+        
+        var updateActivity = {
+        	"id":{
+        		"studentId": studentId,
+        		"courseId": courseId
+        	},
+        	"a1": activity1,
+        	"a2": activity2,
+        	"a3": activity3
+        };
+        
         showLoadingScreen();
         $.ajax({
             method: "POST",
-            url: "../BatAcademy/FacultyDetailsController",
-            data: {task: "update", sid: studentId, cid: courseId, activity1: activity1, activity2: activity2, activity3: activity3}
+            url: "../batacademy/facultyDetailsController/update",
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(updateActivity)
         }).done(function (data) {
             hideLoadingScreen();
             if (data === "success") {

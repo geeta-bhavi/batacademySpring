@@ -47,5 +47,24 @@
     	<servlet-name>JerseyWebApplication</servlet-name>
     	<url-pattern>/webservices/*</url-pattern>
   	</servlet-mapping>
+  	
+  	<servlet>
+	    <servlet-name>error</servlet-name>
+	    <jsp-file>/WEB-INF/views/handleError.jsp</jsp-file>
+	</servlet>
+	<servlet-mapping>
+        <servlet-name>error</servlet-name>
+        <url-pattern>/handleError</url-pattern>
+	</servlet-mapping>
+	
+	<error-page>
+       <error-code>404</error-code>
+       <location>/handleError</location>
+    </error-page>
+
+   <error-page>
+       <error-code>500</error-code>
+       <location>/handleError</location>
+   </error-page>
 
 </web-app>
