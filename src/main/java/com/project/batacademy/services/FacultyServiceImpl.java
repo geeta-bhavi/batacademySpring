@@ -25,11 +25,10 @@ public class FacultyServiceImpl implements FacultyService {
 	@Autowired
 	@Qualifier("courseDaoJdbc")
 	private CourseDao courseDao;
-	
+
 	@Autowired
 	@Qualifier("activityDaoJdbc")
 	private ActivityDao activityDao;
-
 
 	@Override
 	public Faculty getFacultyDetails(int facultyId) {
@@ -52,13 +51,27 @@ public class FacultyServiceImpl implements FacultyService {
 	}
 
 	@Override
-	public int updateActivity(Activity activity, int facultyId) {
+	public int updateActivityScores(Activity activity, int facultyId) {
+		/*
+		 * first check if a row exists in activity table for that student and
+		 * course
+		 */
+		int studentId = activity.getId().getStudentId();
+		int courseId = activity.getId().getCourseId();
+		int noOfRowsUpdated = 0;
 		try {
-			int noOfRowsUpdated = activityDao.updateActivity(activity, facultyId);
+			Activity a1 = activityDao.getActivityDetails(studentId, courseId);
+			
+			/* if a row does exist, update the activity scores or else insert a new row */
+			if (a1 != null) {
+				noOfRowsUpdated = activityDao.updateActivityScores(activity, facultyId);
+			} else {
+				noOfRowsUpdated = activityDao.insertActivity(activity, facultyId);
+			}
+
 			return noOfRowsUpdated;
 		} catch (Exception e) {
 			return 0;
 		}
 	}
-
 }

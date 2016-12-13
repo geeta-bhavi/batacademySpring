@@ -5,6 +5,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "activityCompletion")
 public class ActivityCompletion {
 	private Activity activity;
+	private RegisteredCoursesId registeredCoursesId;
 	private boolean courseCompleted;
 	
 	
@@ -12,9 +13,10 @@ public class ActivityCompletion {
 		
 	}
 	
-	public ActivityCompletion(Activity activity, boolean completed) {
+	public ActivityCompletion(Activity activity,RegisteredCoursesId registeredCoursesId, boolean completed) {
 		this.activity = activity;
 		this.courseCompleted = completed;
+		this.registeredCoursesId = registeredCoursesId;
 	}
 	
 	/* Getters and Setters*/
@@ -31,9 +33,18 @@ public class ActivityCompletion {
 		this.courseCompleted = courseCompleted;
 	}
 
+	public RegisteredCoursesId getRegisteredCoursesId() {
+		return registeredCoursesId;
+	}
+
+	public void setRegisteredCoursesId(RegisteredCoursesId registeredCoursesId) {
+		this.registeredCoursesId = registeredCoursesId;
+	}
+
 	@Override
 	public String toString() {
-		return "StudentActivity [activity=" + activity + ", courseCompleted=" + courseCompleted + "]";
+		return "ActivityCompletion [activity=" + activity + ", registeredCoursesId=" + registeredCoursesId
+				+ ", courseCompleted=" + courseCompleted + "]";
 	}
 
 	

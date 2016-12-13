@@ -17,6 +17,6 @@ public class BasicAuthorization {
         }
  
         // Split the bytes into two strings (login and password) -- use colon as the separator
-        return new String(decodedBytes).split(":", 3);
+        return new String(decodedBytes).split(":", 2);
     }
 }

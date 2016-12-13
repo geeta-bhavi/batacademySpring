@@ -39,7 +39,7 @@ public class RegisteredCoursesDaoImpl implements RegisteredCoursesDao {
 	}
 
 	@Override
-	public RegisteredCourses registeredCourseOfStudent(int studentId, int courseId) throws Exception {
+	public RegisteredCourses getRegisteredCoursesOfStudent(int studentId, int courseId) throws Exception {
 		try {
 			String sql = "select * from registeredCourses where studentId=:studentId and courseId =:courseId";
 			MapSqlParameterSource params = new MapSqlParameterSource();

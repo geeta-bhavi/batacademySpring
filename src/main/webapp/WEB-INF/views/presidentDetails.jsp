@@ -47,6 +47,38 @@
                     </div>
                 </div>
                 <div id="presidentUpdateStatus" class="large-12 medium-12 columns"></div>
+                
+                <div class="presSearchCont">
+                    <form id="searchByStudentId" class="large-6 medium-6 columns">
+                        <div>
+                            <input name="presStudentId" type="number" id="presStudentId" placeholder="Enter Student Id" max="9999" />
+                        </div>
+                        <div>
+                            <input type="submit" value="Submit" class="button secondary">
+                        </div>
+                        <div id="presEnSearchError"></div>
+                    </form>
+
+                    <div id="presEnsearchResults" class="hide large-12 medium-12 columns">
+                        <table class="courseTable" id="selectedCousesTable">
+                            <tr>
+                                <th>Student Id</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>CGPA</th>
+                            </tr>
+                            <tr>
+                                <td id="presEnStudentId"></td>
+                                <td id="presEnFirstName"></td>
+                                <td id="presEnLastName"></td>
+                                <td id="presEnCGPA"></td>
+                            </tr>
+                        </table>
+                        <a href="#" id="deleteStudent" class="button secondary">Delete Student</a>
+                    </div>
+
+                    <div id="presEnUpdatedResults" class="large-12 medium-12 columns"></div>
+                </div>
 
 
                 

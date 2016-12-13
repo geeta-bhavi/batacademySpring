@@ -29,16 +29,16 @@ $(function () {
     $(window).on("open.zf.reveal", batshowQuiz);
     $("#batSignIn").on("submit", batHandleSignIn); /* on sign-in submit of index */
     $(".batQ").on("click", batSubmitQuiz); /*quiz submission on click of radio buttons */
-    $("#userId").on("keypress", removeErrorClass); /*remove error on sign-in page when user starts typing*/
-    $("#userPasssword").on("keypress", removeErrorClass); /*remove error on sign-in page when user starts typing*/
+    $("#userId").on("keypress", removeErrorClass); /*remove error on sign-in page when user starts typing in the login form */
+    $("#userPasssword").on("keypress", removeErrorClass); /*remove error on sign-in page when user starts typing in the login form */
     $(".addCourse").on("click", createCourseList);
     $(".confirm").on("click", showCourseList);
     $("#searchById").on("submit", batSearchById); /* searching student by id and the faculty courseId to update/view activity score */
-    $("#searchStudentId").on("keypress", removeErrorClass); /* remove error when faculty starts typing again */
-    $("#searchCourseId").on("keypress", removeErrorClass);/* remove error when faculty starts typing again */
+    $("#searchStudentId").on("keypress", removeErrorClass); /* remove error when faculty starts typing again in the search form */
+    $("#searchCourseId").on("keypress", removeErrorClass);/* remove error when faculty starts typing again in the search form */
     $("#updateActivity").on("submit", updateActivity); /* update activity scores after faculty confirms scores */
     $("#enableReg").on("change", enableRegistrationForNewSem);/* president has checked enable button */
-    $("#searchByStudentId").on("submit", searchStudent); /* president search to delete student */
+    $("#searchByStudentId").on("submit", searchStudent); /* president searches student to delete student */
     $("#deleteStudent").on("click", deleteStudent);
     $("#batSignUp").on("submit", signUp); /* sign up*/
 
@@ -242,7 +242,7 @@ $(function () {
 
             $.ajax({
                 method: "POST",
-                url: "../batacademy/facultyDetailsController/search",
+                url: "../batacademy/facultyDetailsController/searchStudentByCourse",
                 data: {sid: sid, cid: cid},
                 dataType: "json",
                 beforeSend: function( xhr ) {
@@ -250,9 +250,10 @@ $(function () {
                   }
             }).done(function (data) {
                 hideLoadingScreen();
-
-                if (data.activity !== null) {
-                    var value = data.activity;
+                var value = data.activity;                
+                
+                if (data.activity !== null || data.registeredCoursesId !== null) {
+                    
                     /* if course is not completed then only allow faculty to edit */
                     var isCourseCompleted = data.courseCompleted;
                     if (isCourseCompleted) {
@@ -316,7 +317,7 @@ $(function () {
         showLoadingScreen();
         $.ajax({
             method: "POST",
-            url: "../batacademy/facultyDetailsController/update",
+            url: "../batacademy/facultyDetailsController/updateActivityScores",
             contentType: 'application/json; charset=utf-8',
             data: JSON.stringify(updateActivity)
         }).done(function (data) {
@@ -338,7 +339,7 @@ $(function () {
 
         var checked = $(this).is(":checked");
 
-        /*claesr status div*/
+        /*clears status div*/
         $("#presidentUpdateStatus").html("");
         $("#presidentUpdateStatus").removeClass("success alert label");
 
@@ -377,18 +378,18 @@ $(function () {
             showLoadingScreen();
             $.ajax({
                 method: "POST",
-                url: "../BatAcademy/FacultyDetailsController",
-                data: {task: "presidentEnSearch", sid: sid}
+                url: "../batacademy/facultyDetailsController/presidentSearchStudent",
+                data: {sid: sid},
+                dataType: "json"
             }).done(function (data) {
                 hideLoadingScreen();
+                console.log(JSON.stringify(data));
+                if (data !== undefined && data.studentId != 0) {
 
-                if (data.studentDetails !== undefined) {
-
-                    var student = data.studentDetails;
-                    $("#presEnStudentId").html(sid);
-                    $("#presEnFirstName").html(student.StudentFirstName);
-                    $("#presEnLastName").html(student.StudentLastName);
-                    $("#presEnCGPA").html(student.CGPA);
+                    $("#presEnStudentId").html(data.studentId);
+                    $("#presEnFirstName").html(data.firstName);
+                    $("#presEnLastName").html(data.lastName);
+                    $("#presEnCGPA").html(data.cgpa);
 
                     $("#presEnsearchResults").removeClass("hide").addClass("show");
 
@@ -415,8 +416,8 @@ $(function () {
         showLoadingScreen();
         $.ajax({
             method: "POST",
-            url: "../BatAcademy/FacultyDetailsController",
-            data: {task: "deleteStudent", sid: studentId}
+            url: "../batacademy/facultyDetailsController/deleteStudent",
+            data: {sid: studentId}
         }).done(function (data) {
             hideLoadingScreen();
             if (data === "success") {

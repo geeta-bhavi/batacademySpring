@@ -70,4 +70,12 @@ public class StudentDaoJdbcImpl implements StudentDao {
 		
 	}
 
+	@Override
+	public int removeStudentWithId(int studentId) throws Exception {
+		String sql = "delete from student where studentId=:studentId";
+		MapSqlParameterSource params = new MapSqlParameterSource("studentId", studentId);
+		int result = dbTemplate.update(sql, params);	
+		return result;
+	}
+
 }

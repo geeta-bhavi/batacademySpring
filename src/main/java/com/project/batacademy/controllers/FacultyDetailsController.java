@@ -29,6 +29,7 @@ import com.project.batacademy.domain.ActivityCompletion;
 import com.project.batacademy.domain.Course;
 import com.project.batacademy.domain.Faculty;
 import com.project.batacademy.domain.RegisteredCourses;
+import com.project.batacademy.domain.Student;
 import com.project.batacademy.services.FacultyService;
 import com.project.batacademy.services.StudentService;
 
@@ -36,8 +37,6 @@ import com.project.batacademy.services.StudentService;
 public class FacultyDetailsController {
 
 	private static final Logger logger = LoggerFactory.getLogger(FacultyDetailsController.class);
-	private static String STUDENT_SERVICES_URL = "http://localhost:8080/batacademy/webservices/studrest/student/";
-	private static Client client = null;
 
 	@Autowired
 	@Qualifier("facultyServiceImpl")
@@ -47,20 +46,21 @@ public class FacultyDetailsController {
 	@Qualifier("studentServiceImpl")
 	StudentService studentservice;
 
+	/* get faculty information after authenticating from login page */
 	@RequestMapping(value = "/facultyDetailsController", method = RequestMethod.GET)
-	public ModelAndView facultyDetails(HttpSession session) {
+	public ModelAndView getFacultyDetails(HttpSession session) {
 
 		ModelAndView modelView = new ModelAndView("home");
 
 		if (session != null && session.getAttribute("facultyId") != null) {
 			int facultyId = (Integer) session.getAttribute("facultyId");
 			Faculty faculty = null;
-			List<Course> listOfCourses = null;
+			List<Course> courses = null;
 
 			faculty = facultyService.getFacultyDetails(facultyId);
 
 			if (faculty != null) {
-				listOfCourses = facultyService.getCoursesTaughtByFaculty(facultyId);
+				courses = facultyService.getCoursesTaughtByFaculty(facultyId);
 
 				/*
 				 * if president signed in, then go to president details page
@@ -72,75 +72,79 @@ public class FacultyDetailsController {
 				}
 
 				modelView.addObject("faculty", faculty);
-				modelView.addObject("courses", listOfCourses);
+				modelView.addObject("courses", courses);
 
 			}
 		}
 		return modelView;
 	}
 
-	@RequestMapping(value = "/facultyDetailsController/search", method = RequestMethod.POST)
-	@ResponseBody
-	public ActivityCompletion searchStudentByIdAndCourse(@RequestHeader(value = "Accept") String accept, int sid,
-			int cid, HttpSession session) {
-		
+	/*
+	 * get student's activity scores and whether the course is completed or not
+	 * status
+	 */
+	@RequestMapping(value = "/facultyDetailsController/searchStudentByCourse", method = RequestMethod.POST)
+	public @ResponseBody ActivityCompletion searchStudentByIdAndCourse(int sid, int cid, HttpSession session) {
+
 		ActivityCompletion activityCompletion = new ActivityCompletion();
 
 		if (session != null && session.getAttribute("facultyId") != null) {
 
-			int responseCode;
-			MediaType mediaType = MediaType.APPLICATION_XML_TYPE;
-			Client client = getClient();
-
-			/* if json requested */
-			if (accept.equals("application/json")) {
-				client.register(JacksonFeature.class);
-				mediaType = MediaType.APPLICATION_JSON_TYPE;
-			}
-
-			WebTarget target = client.target(STUDENT_SERVICES_URL + sid + "/course/" + cid);
-			Invocation getAddrEntryInvocation = target.request(mediaType).buildGet();
-			Response response = getAddrEntryInvocation.invoke();
-
-			responseCode = response.getStatus();
-			logger.info("/facultyDetailsController/search: The response code is: " + responseCode);
-
-			if (responseCode == 200) {
-				activityCompletion = response.readEntity(ActivityCompletion.class);
-			}
+			activityCompletion = studentservice.getActivityAndCompletedState(sid, cid);
 
 		}
 
 		return activityCompletion;
 	}
-	
-	@RequestMapping(value = "/facultyDetailsController/update", method = RequestMethod.POST, consumes={"application/json"})
+
+	/* update student's activity scores */
+	@RequestMapping(value = "/facultyDetailsController/updateActivityScores", method = RequestMethod.POST, consumes = {
+			"application/json" })
 	@ResponseBody
-	public String updateStudentActivity(@RequestBody Activity activity, HttpSession session) {
-		
+	public String updateStudentActivityScores(@RequestBody Activity activity, HttpSession session) {
+
 		if (session != null && session.getAttribute("facultyId") != null) {
-			
+
 			int facultyId = (Integer) session.getAttribute("facultyId");
-		
-			int updated = facultyService.updateActivity(activity, facultyId);
-			
-			if(updated == 1) {
+
+			int updated = facultyService.updateActivityScores(activity, facultyId);
+
+			if (updated == 1) {
 				return "success";
 			}
-			
+
 		}
-		
-		
+
 		return "error";
 	}
-	
 
-	private static Client getClient() {
-		if (client == null) {
-			client = ClientBuilder.newClient();
+	/* President searches a student for deletion */
+	@RequestMapping(value = "/facultyDetailsController/presidentSearchStudent", method = RequestMethod.POST)
+	public @ResponseBody Student presidentSearchStudent(int sid, HttpSession session) {
+		Student student = null;
+
+		if (session != null && session.getAttribute("facultyId") != null) {
+			student = studentservice.getStudentDetails(sid);
 		}
 
-		return client;
+		return student;
+	}
+
+	/* President deletes a student */
+	@RequestMapping(value = "/facultyDetailsController/deleteStudent", method = RequestMethod.POST)
+	@ResponseBody
+	public String presidentDeleteStudent(int sid, HttpSession session) {
+
+		String result = "error";
+
+		if (session != null && session.getAttribute("facultyId") != null) {
+			int returnVal = studentservice.removeStudentWithId(sid);
+			if (returnVal == 1) {
+				result = "success";
+			}
+		}
+
+		return result;
 	}
 
 }

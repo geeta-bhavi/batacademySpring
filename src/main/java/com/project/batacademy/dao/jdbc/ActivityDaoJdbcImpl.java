@@ -1,5 +1,9 @@
 package com.project.batacademy.dao.jdbc;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
@@ -10,6 +14,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +26,7 @@ import com.project.batacademy.domain.Activity;
 @Transactional
 public class ActivityDaoJdbcImpl implements ActivityDao {
 
-	private static final Logger logger = LoggerFactory.getLogger(CourseDaoJdbcImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(ActivityDaoJdbcImpl.class);
 	@Autowired
 	@Qualifier("dataSource")
 	private DataSource dataSource;
@@ -38,15 +43,38 @@ public class ActivityDaoJdbcImpl implements ActivityDao {
 		jdbcInsert = new SimpleJdbcInsert(dataSource).withTableName("activity");
 	}
 
+	// public Activity getActivityDetails(int studentId, int courseId) throws
+	// Exception {
+	// try {
+	// String sql = "select * from activity where studentId=:studentId and
+	// courseId=:courseId";
+	// MapSqlParameterSource params = new MapSqlParameterSource();
+	// params.addValue("studentId", studentId);
+	// params.addValue("courseId", courseId);
+	// Activity activity = dbTemplate.queryForObject(sql, params,
+	// activityRowMapper);
+	// return activity;
+	// } catch (Exception e) {
+	// logger.error("ActivityDaoJdbcImpl getActivityDetails by student id and
+	// course id: " + e.getMessage());
+	// throw e;
+	// }
+	// }
+
 	@Override
 	public Activity getActivityDetails(int studentId, int courseId) throws Exception {
 		try {
 			String sql = "select * from activity where studentId=:studentId and courseId=:courseId";
-			MapSqlParameterSource params = new MapSqlParameterSource();
-			params.addValue("studentId", studentId);
-			params.addValue("courseId", courseId);
-			Activity activity = dbTemplate.queryForObject(sql, params, activityRowMapper);
-			return activity;
+			Map<String, Integer> params = new HashMap<String, Integer>();
+			params.put("studentId", studentId);
+			params.put("courseId", courseId);
+			SqlParameterSource paramSource = new MapSqlParameterSource(params);
+			List<Activity> activity = dbTemplate.query(sql, paramSource, activityRowMapper);
+			if (activity != null && !activity.isEmpty()) {
+				return activity.get(0);
+			} else {
+				return null;
+			}
 		} catch (Exception e) {
 			logger.error("ActivityDaoJdbcImpl getActivityDetails by student id and course id: " + e.getMessage());
 			throw e;
@@ -54,16 +82,17 @@ public class ActivityDaoJdbcImpl implements ActivityDao {
 	}
 
 	/*
-	 * update activity table only when course is not completed and is taught by
-	 * the same faculty who teaches the course
+	 * update activity table only when course is not completed and the faculty
+	 * id is same faculty who teaches the course
 	 */
 	@Override
-	public int updateActivity(Activity activity, int facultyId) throws Exception {
+	public int updateActivityScores(Activity activity, int facultyId) throws Exception {
+
 		try {
 			String sql = "update activity A "
-					+ "INNER JOIN registeredCourses B ON A.courseId = B.courseId and A.studentId = B.studentId "
-					+ "INNER JOIN course C ON B.courseId = C.courseId " + "set a1=:a1, a2=:a2, a3=:a3 "
-					+ "where A.studentId=:studentId and A.courseId=:courseId and C.facultyId =:facultyId and B.completed = false";
+					+ "INNER JOIN registeredCourses R ON A.courseId = R.courseId and A.studentId = R.studentId "
+					+ "INNER JOIN course C ON R.courseId = C.courseId " + "set a1=:a1, a2=:a2, a3=:a3 "
+					+ "where A.studentId=:studentId and A.courseId=:courseId and C.facultyId =:facultyId and R.completed = false";
 			MapSqlParameterSource params = new MapSqlParameterSource();
 			params.addValue("a1", activity.getA1());
 			params.addValue("a2", activity.getA2());
@@ -73,10 +102,51 @@ public class ActivityDaoJdbcImpl implements ActivityDao {
 			params.addValue("facultyId", facultyId);
 			int noOfRowsUpdate = dbTemplate.update(sql, params);
 			return noOfRowsUpdate;
+
 		} catch (Exception e) {
-			logger.error("ActivityDaoJdbcImpl updateActivity by student id and course id: " + e.getMessage());
+			logger.error("ActivityDaoJdbcImpl updateActivityScores " + e.getMessage());
 			throw e;
 		}
+
+	}
+	
+	
+	/*
+	 * insert into activity table only when course is not completed and the faculty
+	 * id is same faculty who teaches the course
+	 */
+	
+	public int insertActivity(Activity activity, int facultyId) throws Exception {
+
+		int studentId = activity.getId().getStudentId();
+		int courseId = activity.getId().getCourseId();
+		try {
+			
+			String sql = "select * from registeredCourses R INNER JOIN course C ON R.courseId = C.courseId "
+					+ "where R.studentId=:studentId and R.courseId=:courseId and C.facultyId =:facultyId and R.completed = false";
+			Map<String, Integer> paramsSource = new HashMap<String, Integer>();
+			paramsSource.put("studentId", studentId);
+			paramsSource.put("courseId", courseId);
+			paramsSource.put("facultyId", facultyId);
+			List<Map<String, Object>> registeredCourses = dbTemplate.queryForList(sql, paramsSource);
+			if (registeredCourses != null && !registeredCourses.isEmpty()) {
+				
+				MapSqlParameterSource params = new MapSqlParameterSource();
+				params.addValue("studentId", studentId);
+				params.addValue("courseId", courseId);
+				params.addValue("a1", activity.getA1());
+				params.addValue("a2", activity.getA2());
+				params.addValue("a3", activity.getA3());
+				jdbcInsert.execute(params);
+				return 1;
+			}
+			return 0;
+
+		} catch (Exception e) {
+			logger.error("ActivityDaoJdbcImpl insertActivity " + e.getMessage());
+			throw e;
+		}
+
 	}
 
 }

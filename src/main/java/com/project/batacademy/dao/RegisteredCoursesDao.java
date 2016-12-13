@@ -4,6 +4,6 @@ import com.project.batacademy.domain.RegisteredCourses;
 
 public interface RegisteredCoursesDao {
 	
-	public RegisteredCourses registeredCourseOfStudent(int studentId, int courseId) throws Exception;
+	public RegisteredCourses getRegisteredCoursesOfStudent(int studentId, int courseId) throws Exception;
 
 }

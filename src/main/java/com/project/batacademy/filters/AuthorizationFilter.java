@@ -55,9 +55,8 @@ public class AuthorizationFilter implements ContainerRequestFilter {
         String[] userInfoList = BasicAuthorization.decode(auth);
         id = userInfoList[0];
         pswd = userInfoList[1];
-        userType = userInfoList[2];
         
-        logger.debug("Authenticating user: " + id + " with password: " + pswd+" user type "+ userType);
+        logger.debug("Authenticating user: " + id + " with password: " + pswd);
         
 //        userAccount = userService.findUserFromAcctName(acctName);
 //        if (userAccount == null || !userAccount.hasPassword(pswd)) {

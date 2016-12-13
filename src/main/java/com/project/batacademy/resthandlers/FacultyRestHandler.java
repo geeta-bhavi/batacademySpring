@@ -2,18 +2,21 @@ package com.project.batacademy.resthandlers;
 
 import java.util.List;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.project.batacademy.domain.Activity;
-import com.project.batacademy.domain.ActivityId;
 import com.project.batacademy.domain.Course;
 import com.project.batacademy.domain.Faculty;
 import com.project.batacademy.exceptions.UnknownResourceException;
@@ -60,25 +63,30 @@ public class FacultyRestHandler {
 		return listOfCourses;
 	}
 
-	/* update activity score taught by the faculty */
-	@PUT
-	@Path("/faculty/{facultyId}/studentId/{studentId}/courseId/{courseId}/activity/{a1}/{a2}/{a3}")
+	/* update activity scores of the student taught by the faculty 
+	 * To test, you can PUT the activity as below:
+	 * json: {"id": {"studentId": 1002, "courseId": 13}, "a1": 100, "a2": 100, "a3": 100}
+	 * xml: <activity><id><studentId>1002</studentId><courseId>13</courseId></id><a1>100</a1><a2>100</a2><a3>100</a3></activity>
+	 * URL:  http://localhost:8080/batacademy/webservices/facultyrest/faculty/{facultyId}/activity
+	 * */
+	@POST
+	@Path("/faculty/{facultyId}/activity")
 	@Produces("application/xml, application/json")
-	public int updateActivity(@PathParam("facultyId") int facultyId, @PathParam("studentId") int studentId,
-			@PathParam("courseId") int courseId, @PathParam("a1") int a1, @PathParam("a2") int a2,
-			@PathParam("a3") int a3) {
+	@Consumes("application/json, application/xml")
+	public Response updateActivityScores(@PathParam("facultyId") int facultyId, Activity activity) {
 		
-		int noOfRowsUpdated = 0;
-		ActivityId activityId = new ActivityId(studentId, courseId);
-		Activity activity = new Activity(activityId, a1, a2, a3);
+		ResponseBuilder respBuilder;
 		
-		noOfRowsUpdated = facultyService.updateActivity(activity, facultyId);
+		int noOfRowsUpdated = facultyService.updateActivityScores(activity, facultyId);
 		
 		if(noOfRowsUpdated == 0) {
 			throw new UnknownResourceException("no rows were updated");
 		}
 
-		return noOfRowsUpdated;
+		logger.info("Successfully updated Student activity scores: " + activity);
+		respBuilder = Response.status(Status.CREATED);
+		respBuilder.entity(activity);
+		return respBuilder.build();
 	}
 
 }
