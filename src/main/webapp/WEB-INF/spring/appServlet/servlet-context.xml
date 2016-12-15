@@ -25,7 +25,7 @@
 		<property name="suffix" value=".jsp" />
 	</bean>
 	
-	<context:component-scan base-package="com.project.batacademy" />
+	<context:component-scan base-package="com.project.batacademy.controllers" />
 	
 	
 	
