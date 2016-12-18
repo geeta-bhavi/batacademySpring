@@ -1,5 +1,7 @@
 package com.project.batacademy.dao.jdbc;
 
+import java.util.List;
+
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
@@ -16,11 +18,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.project.batacademy.dao.RegisteredCoursesDao;
 import com.project.batacademy.domain.RegisteredCourses;
+import com.project.batacademy.domain.RegisteredCoursesId;
 
 @Repository("registeredCoursesDaoJdbc")
-@Transactional
 public class RegisteredCoursesDaoImpl implements RegisteredCoursesDao {
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(RegisteredCoursesDaoImpl.class);
 	@Autowired
 	@Qualifier("dataSource")
@@ -29,12 +31,14 @@ public class RegisteredCoursesDaoImpl implements RegisteredCoursesDao {
 	private NamedParameterJdbcTemplate dbTemplate;
 	private SimpleJdbcInsert jdbcInsert;
 	private RegisteredCoursesRowMapper registeredCoursesRowMapper;
+	private RegisteredCoursesIdRowMapper registeredCoursesIdRowMapper;
 
 	@PostConstruct
 	public void setup() {
 		jdbcTemplate = new JdbcTemplate(dataSource);
 		dbTemplate = new NamedParameterJdbcTemplate(dataSource);
 		registeredCoursesRowMapper = new RegisteredCoursesRowMapper();
+		registeredCoursesIdRowMapper = new RegisteredCoursesIdRowMapper();
 		jdbcInsert = new SimpleJdbcInsert(dataSource).withTableName("registeredCourses");
 	}
 
@@ -45,12 +49,41 @@ public class RegisteredCoursesDaoImpl implements RegisteredCoursesDao {
 			MapSqlParameterSource params = new MapSqlParameterSource();
 			params.addValue("studentId", studentId);
 			params.addValue("courseId", courseId);
-			RegisteredCourses regCourses =  dbTemplate.queryForObject(sql, params, registeredCoursesRowMapper);
+			RegisteredCourses regCourses = dbTemplate.queryForObject(sql, params, registeredCoursesRowMapper);
 			return regCourses;
-		} catch(Exception e) {
-			logger.error("RegisteredCoursesDaoImpl registeredCourseOfStudent by studentId and courseId: "+ e.getMessage());
+		} catch (Exception e) {
+			logger.error(
+					"RegisteredCoursesDaoImpl getRegisteredCoursesOfStudent by studentId and courseId: " + e.getMessage());
 			throw e;
 		}
+	}
+
+	@Override
+	public List<RegisteredCoursesId> getNotCompletedCoursesOfStudents() throws Exception {
+		try {
+			String sql = "select * from registeredCourses where completed=false";
+			List<RegisteredCoursesId> listOfRegCoursesId = jdbcTemplate.query(sql, registeredCoursesIdRowMapper);
+			return listOfRegCoursesId;
+		} catch (Exception e) {
+			logger.error(
+					"RegisteredCoursesDaoImpl getNotCompletedCoursesOfStudents: " + e.getMessage());
+			throw e;
+		}
+
+	}
+
+	@Override
+	public void updateCompletedColumn(boolean completed) throws Exception {
+		try {
+			String sql = "update registeredCourses set completed=:completed";
+			MapSqlParameterSource params = new MapSqlParameterSource("completed", completed);		
+			dbTemplate.update(sql,params);
+			
+		} catch(Exception e) {
+			logger.error("RegisteredCoursesDaoImpl updateCompletedColumn: " + e.getMessage());
+			throw e;
+		}
+		
 	}
 
 }

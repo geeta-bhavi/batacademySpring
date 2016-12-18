@@ -26,29 +26,32 @@ import com.project.batacademy.services.StudentService;
 public class StudentDetailsController {
 
 	private static final Logger logger = LoggerFactory.getLogger(StudentDetailsController.class);
-	
+
 	@Autowired
 	@Qualifier("studentServiceImpl")
 	StudentService studentService;
 
 	@RequestMapping(value = "/studentDetailsController", method = RequestMethod.GET)
 	public ModelAndView getStudentDetails(HttpSession session) {
-		
+
 		ModelAndView modelView = new ModelAndView("home");
-		
+
 		if (session != null) {
 
 			if (session.getAttribute("studentId") != null) {
 
 				int studentId = (Integer) session.getAttribute("studentId");
 				Student student = null;
-				
-				student = studentService.getStudentDetails(studentId);
-				
-				if(student != null) {
+
+				try {
+					student = studentService.getStudentDetails(studentId);
 					modelView = new ModelAndView("studentDetails");
 					modelView.addObject("student", student);
+				} catch (Exception e) {
+					modelView = new ModelAndView("handleError");
+					modelView.addObject("message", e.getMessage());
 				}
+
 			}
 		}
 

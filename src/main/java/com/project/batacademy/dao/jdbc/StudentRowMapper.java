@@ -13,6 +13,7 @@ public class StudentRowMapper implements RowMapper<Student> {
 	
 	public Student mapRow(ResultSet resultSet, int row) throws SQLException {
 		Student stud;
+		String password;
 		
 		stud = new Student();
 		stud.setStudentId(resultSet.getInt("studentId"));
@@ -21,6 +22,12 @@ public class StudentRowMapper implements RowMapper<Student> {
 		stud.setGender(resultSet.getString("gender"));
 		stud.setPhone(resultSet.getString("phone"));
 		stud.setRegistered(resultSet.getBoolean("registered"));
+		try {
+			password = resultSet.getString("password");
+		} catch (SQLException e) {
+			password = null;
+		}
+		stud.setPassword(password);
 		
 		
 		

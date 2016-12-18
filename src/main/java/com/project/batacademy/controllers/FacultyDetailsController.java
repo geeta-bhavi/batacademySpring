@@ -56,12 +56,9 @@ public class FacultyDetailsController {
 			int facultyId = (Integer) session.getAttribute("facultyId");
 			Faculty faculty = null;
 			List<Course> courses = null;
-
-			faculty = facultyService.getFacultyDetails(facultyId);
-
-			if (faculty != null) {
+			try {
+				faculty = facultyService.getFacultyDetails(facultyId);
 				courses = facultyService.getCoursesTaughtByFaculty(facultyId);
-
 				/*
 				 * if president signed in, then go to president details page
 				 */
@@ -74,7 +71,11 @@ public class FacultyDetailsController {
 				modelView.addObject("faculty", faculty);
 				modelView.addObject("courses", courses);
 
+			} catch (Exception e) {
+				modelView = new ModelAndView("handleError");
+				modelView.addObject("message", e.getMessage());
 			}
+
 		}
 		return modelView;
 	}
@@ -90,7 +91,13 @@ public class FacultyDetailsController {
 
 		if (session != null && session.getAttribute("facultyId") != null) {
 
-			activityCompletion = studentservice.getActivityAndCompletedState(sid, cid);
+			try {
+
+				activityCompletion = studentservice.getActivityAndCompletedState(sid, cid);
+
+			} catch (Exception e) {
+
+			}
 
 		}
 
@@ -107,10 +114,11 @@ public class FacultyDetailsController {
 
 			int facultyId = (Integer) session.getAttribute("facultyId");
 
-			int updated = facultyService.updateActivityScores(activity, facultyId);
-
-			if (updated == 1) {
+			try {
+				int updated = facultyService.updateActivityScores(activity, facultyId);
 				return "success";
+			} catch (Exception e) {
+
 			}
 
 		}
@@ -124,7 +132,12 @@ public class FacultyDetailsController {
 		Student student = null;
 
 		if (session != null && session.getAttribute("facultyId") != null) {
-			student = studentservice.getStudentDetails(sid);
+			try {
+				student = studentservice.getStudentDetails(sid);
+			} catch (Exception e) {
+
+			}
+
 		}
 
 		return student;
@@ -138,13 +151,36 @@ public class FacultyDetailsController {
 		String result = "error";
 
 		if (session != null && session.getAttribute("facultyId") != null) {
-			int returnVal = studentservice.removeStudentWithId(sid);
-			if (returnVal == 1) {
+			try {
+				int returnVal = studentservice.removeStudentWithId(sid);
 				result = "success";
+			} catch (Exception e) {
 			}
 		}
 
 		return result;
+
+	}
+
+	/* President checks/un-checks enable checkbox */
+	@RequestMapping(value = "/facultyDetailsController/enableOrDisableRegistration", method = RequestMethod.POST)
+	@ResponseBody
+	public String enableOrDisableRegistration(boolean enable, HttpSession session) {
+
+		String enabled = "error";
+		
+		try {
+			if (enable) {
+				facultyService.processEnableDisableRegistration();
+			}
+			facultyService.updateEnableColumn(enable);
+			enabled = "success";
+			
+		} catch (Exception e) {
+			
+		}
+		
+		return enabled;
 	}
 
 }

@@ -13,6 +13,7 @@ public class FacultyRowMapper implements RowMapper<Faculty> {
 	public Faculty mapRow(ResultSet resultSet, int row) throws SQLException {
 		
 		Faculty faculty = null;
+		String password;
 		
 		faculty = new Faculty();
 		faculty.setFacultyId(resultSet.getInt("facultyId"));
@@ -22,9 +23,13 @@ public class FacultyRowMapper implements RowMapper<Faculty> {
 		faculty.setPhone(resultSet.getString("phone"));
 		faculty.setDesignation(resultSet.getString("designation"));
 		faculty.setEnable(resultSet.getBoolean("enable"));
-		
-		
-		
+		try {
+			password = resultSet.getString("password");
+		} catch (SQLException e) {
+			password = null;
+		}
+		faculty.setPassword(password);
+
 		return faculty;
 	}
 

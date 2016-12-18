@@ -2,10 +2,18 @@ package com.project.batacademy.domain;
 
 public class UserAccount {
 
-	private int id;
+	private String name;
 	private String password;
 
 	public UserAccount() {
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getPassword() {
@@ -16,20 +24,11 @@ public class UserAccount {
 		this.password = password;
 	}
 
-	public boolean hasPassword(String testPswd) {
-		return testPswd.equals(password);
-	}
-
+	@Override
 	public String toString() {
-		return "Account[ User: " + id + "  password: " + password + "]";
+		return "UserAccount [firstName=" + name + ", password=" + password + "]";
 	}
 
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
+	
 
 }

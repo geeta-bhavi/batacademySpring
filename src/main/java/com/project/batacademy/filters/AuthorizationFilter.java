@@ -12,6 +12,9 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.log4j.Logger;
 
+import com.project.batacademy.domain.UserAccount;
+import com.project.batacademy.services.UserService;
+
 /* NOTE: Register the filter like the REST handlers -- in this case it's done in the RestApplicationConfig class  */
 @PreMatching
 public class AuthorizationFilter implements ContainerRequestFilter {
@@ -30,12 +33,13 @@ public class AuthorizationFilter implements ContainerRequestFilter {
         String method = requestContext.getMethod();
         UriInfo uriInfo = requestContext.getUriInfo();
         String path = uriInfo.getPath();
-        String id, pswd, userType;
+        String id, pswd;
+        UserAccount userAccount;
         
-        logger.debug("Start Authorization Filter");
-        logger.debug(path);
+        logger.info("Start Authorization Filter");
+        logger.info(path);
         
-        if (path.equals("/student/")) {
+        if (path.equals("studrest/student/")) {
         	/* Creating a new user, authorization not required */
         	return;
         }
@@ -58,9 +62,9 @@ public class AuthorizationFilter implements ContainerRequestFilter {
         
         logger.debug("Authenticating user: " + id + " with password: " + pswd);
         
-//        userAccount = userService.findUserFromAcctName(acctName);
+//        userAccount = UserService.extractAcctFromAuthorization(auth);
 //        if (userAccount == null || !userAccount.hasPassword(pswd)) {
-//        	logger.debug("User not found: " + acctName);
+//        	logger.debug("User not found: ");
 //        	fail(requestContext, "Invalid Login Credentials");
 //        	return;
 //        }

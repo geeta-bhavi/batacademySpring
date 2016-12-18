@@ -8,6 +8,7 @@ import javax.ws.rs.core.Application;
 
 import org.glassfish.jersey.jackson.JacksonFeature;
 
+import com.project.batacademy.exceptions.InvalidAcctExResolver;
 import com.project.batacademy.exceptions.UnknownResourceExResolver;
 import com.project.batacademy.filters.AuthorizationFilter;
 
@@ -25,6 +26,7 @@ public class RestApplicationConfig extends Application {
 		restClassSet.add(StudentRestHandler.class);
 		restClassSet.add(FacultyRestHandler.class);
 		restClassSet.add(UnknownResourceExResolver.class);
+		restClassSet.add(InvalidAcctExResolver.class);
 		
 	}
 	

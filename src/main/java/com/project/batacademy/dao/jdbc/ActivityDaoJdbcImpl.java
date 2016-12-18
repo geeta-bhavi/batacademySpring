@@ -1,5 +1,6 @@
 package com.project.batacademy.dao.jdbc;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,9 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.project.batacademy.dao.ActivityDao;
 import com.project.batacademy.domain.Activity;
+import com.project.batacademy.domain.RegisteredCoursesId;
 
 @Repository("activityDaoJdbc")
-@Transactional
 public class ActivityDaoJdbcImpl implements ActivityDao {
 
 	private static final Logger logger = LoggerFactory.getLogger(ActivityDaoJdbcImpl.class);
@@ -42,24 +43,6 @@ public class ActivityDaoJdbcImpl implements ActivityDao {
 		activityRowMapper = new ActivityRowMapper();
 		jdbcInsert = new SimpleJdbcInsert(dataSource).withTableName("activity");
 	}
-
-	// public Activity getActivityDetails(int studentId, int courseId) throws
-	// Exception {
-	// try {
-	// String sql = "select * from activity where studentId=:studentId and
-	// courseId=:courseId";
-	// MapSqlParameterSource params = new MapSqlParameterSource();
-	// params.addValue("studentId", studentId);
-	// params.addValue("courseId", courseId);
-	// Activity activity = dbTemplate.queryForObject(sql, params,
-	// activityRowMapper);
-	// return activity;
-	// } catch (Exception e) {
-	// logger.error("ActivityDaoJdbcImpl getActivityDetails by student id and
-	// course id: " + e.getMessage());
-	// throw e;
-	// }
-	// }
 
 	@Override
 	public Activity getActivityDetails(int studentId, int courseId) throws Exception {
@@ -109,19 +92,18 @@ public class ActivityDaoJdbcImpl implements ActivityDao {
 		}
 
 	}
-	
-	
+
 	/*
-	 * insert into activity table only when course is not completed and the faculty
-	 * id is same faculty who teaches the course
+	 * insert into activity table only when course is not completed and the
+	 * faculty id is same faculty who teaches the course
 	 */
-	
+
 	public int insertActivity(Activity activity, int facultyId) throws Exception {
 
 		int studentId = activity.getId().getStudentId();
 		int courseId = activity.getId().getCourseId();
 		try {
-			
+
 			String sql = "select * from registeredCourses R INNER JOIN course C ON R.courseId = C.courseId "
 					+ "where R.studentId=:studentId and R.courseId=:courseId and C.facultyId =:facultyId and R.completed = false";
 			Map<String, Integer> paramsSource = new HashMap<String, Integer>();
@@ -130,7 +112,7 @@ public class ActivityDaoJdbcImpl implements ActivityDao {
 			paramsSource.put("facultyId", facultyId);
 			List<Map<String, Object>> registeredCourses = dbTemplate.queryForList(sql, paramsSource);
 			if (registeredCourses != null && !registeredCourses.isEmpty()) {
-				
+
 				MapSqlParameterSource params = new MapSqlParameterSource();
 				params.addValue("studentId", studentId);
 				params.addValue("courseId", courseId);
@@ -147,6 +129,30 @@ public class ActivityDaoJdbcImpl implements ActivityDao {
 			throw e;
 		}
 
+	}
+
+	@Override
+	public List<Activity> getActivitiesOfNotCompletedCourses(List<RegisteredCoursesId> notCompletedCourses)
+			throws Exception {
+		List<Activity> activities = new ArrayList<Activity>();
+		try{
+			
+			for (RegisteredCoursesId regCourse : notCompletedCourses) {
+				String sql = "Select * from activity where studentId=:studentId and courseId=:courseId";
+				MapSqlParameterSource params = new MapSqlParameterSource();
+				params.addValue("studentId", regCourse.getStudentId());
+				params.addValue("courseId", regCourse.getCourseId());
+				Activity activity = (Activity) dbTemplate.queryForObject(sql, params, activityRowMapper);
+				activities.add(activity);
+
+			}
+			
+		} catch (Exception e) {
+			logger.error("ActivityDaoJdbcImpl getActivitiesOfNotCompletedCourses " + e.getMessage());
+			throw e;
+		}
+		
+		return activities;
 	}
 
 }

@@ -20,7 +20,6 @@ import com.project.batacademy.dao.CourseDao;
 import com.project.batacademy.domain.Course;
 
 @Repository("courseDaoJdbc")
-@Transactional
 public class CourseDaoJdbcImpl implements CourseDao {
 
 	private static final Logger logger = LoggerFactory.getLogger(CourseDaoJdbcImpl.class);

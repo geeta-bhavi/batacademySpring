@@ -28,7 +28,7 @@ public class UserService {
 		String loginInfo[];
 		loginInfo = new String(decodedBytes).split(":", 2);
 		UserAccount acct = new UserAccount();
-		acct.setId(Integer.parseInt(loginInfo[0]));
+		acct.setName(loginInfo[0]);
 		acct.setPassword(loginInfo[1]);
 		return acct;
 	}

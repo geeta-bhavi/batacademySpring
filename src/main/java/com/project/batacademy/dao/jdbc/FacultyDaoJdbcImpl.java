@@ -19,7 +19,6 @@ import com.project.batacademy.dao.FacultyDao;
 import com.project.batacademy.domain.Faculty;
 
 @Repository("facultyDaoJdbc")
-@Transactional
 public class FacultyDaoJdbcImpl implements FacultyDao {
 	private static final Logger logger = LoggerFactory.getLogger(FacultyDaoJdbcImpl.class);
 	@Autowired
@@ -54,18 +53,48 @@ public class FacultyDaoJdbcImpl implements FacultyDao {
 
 	}
 
-	public Faculty getFacultyDetails(int facultyId) {
+	public Faculty getFacultyDetails(int facultyId) throws Exception {
 		Faculty faculty = null;
 		try {
 			String sql = "select facultyId, firstName, lastname, gender, phone, designation, enable from faculty where facultyId=:facultyId";
 			MapSqlParameterSource params = new MapSqlParameterSource("facultyId", facultyId);
 			faculty = dbTemplate.queryForObject(sql, params, facultyRowMapper);
-		} catch (EmptyResultDataAccessException e) {
+		} catch (Exception e) {
 			logger.error("FacultyDaoJdbcImpl getFacultyDetails by id: " + e);
+			throw e;
 		}
 
 		return faculty;
 
+	}
+
+	@Override
+	public Faculty getFacultyWithPassword(int facultyId) throws Exception {
+		Faculty faculty = null;
+		try {
+			String sql = "select * from faculty where facultyId=:facultyId";
+			MapSqlParameterSource params = new MapSqlParameterSource("facultyId", facultyId);
+			faculty = dbTemplate.queryForObject(sql, params, facultyRowMapper);
+		} catch (Exception e) {
+			logger.error("FacultyDaoJdbcImpl getFacultyWithPassword by id: " + e);
+			throw e;
+		}
+
+		return faculty;
+	}
+
+	@Override
+	public void updateEnableColumn(boolean enabled) throws Exception {
+		try {
+			String sql = "update faculty set enable=:enabled where facultyId=1";
+			MapSqlParameterSource params = new MapSqlParameterSource("enabled", enabled);
+			dbTemplate.update(sql,params);
+			
+		} catch(Exception e) {
+			logger.error("FacultyDaoJdbcImpl updateEnableColumn: " + e.getMessage());
+			throw e;
+		}
+		
 	}
 
 }

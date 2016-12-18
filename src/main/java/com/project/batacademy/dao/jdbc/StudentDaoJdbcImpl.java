@@ -19,7 +19,6 @@ import com.project.batacademy.dao.StudentDao;
 import com.project.batacademy.domain.Student;
 
 @Repository("studentDaoJdbc")
-@Transactional
 public class StudentDaoJdbcImpl implements StudentDao {
 	private static final Logger logger = LoggerFactory.getLogger(StudentDaoJdbcImpl.class);
 	@Autowired
@@ -35,47 +34,103 @@ public class StudentDaoJdbcImpl implements StudentDao {
 		jdbcTemplate = new JdbcTemplate(dataSource);
 		dbTemplate = new NamedParameterJdbcTemplate(dataSource);
 		studentRowMapper = new StudentRowMapper();
-		jdbcInsert = new SimpleJdbcInsert(dataSource)
-		                 .withTableName("student")
-		                 .usingGeneratedKeyColumns("studentId");
+		jdbcInsert = new SimpleJdbcInsert(dataSource).withTableName("student").usingGeneratedKeyColumns("studentId");
 	}
-	
 
-	
 	public boolean authenticateStudent(int userId, String pwd) throws Exception {
 		try {
 			String sql = "select studentId, firstName, lastName, gender, phone, cgpa, registered from student where studentId=:studentId and password =:password";
 			MapSqlParameterSource params = new MapSqlParameterSource();
 			params.addValue("studentId", userId);
 			params.addValue("password", pwd);
-			Student stud =  dbTemplate.queryForObject(sql, params, studentRowMapper);
+			Student stud = dbTemplate.queryForObject(sql, params, studentRowMapper);
 			return true;
-		} catch(Exception e) {
-			logger.error("StudentDaoJdbcImpl getStudentDetails by id and pwd: "+ e.getMessage());
+		} catch (Exception e) {
+			logger.error("StudentDaoJdbcImpl getStudentDetails by id and pwd: " + e.getMessage());
 			throw e;
 		}
 	}
-	
+
 	public Student getStudentDetails(int studentId) throws Exception {
 		Student stud = null;
 		try {
 			String sql = "select studentId, firstName, lastName, gender, phone, cgpa, registered from student where studentId=:studentId";
 			MapSqlParameterSource params = new MapSqlParameterSource("studentId", studentId);
-			stud =  dbTemplate.queryForObject(sql, params, studentRowMapper);
+			stud = dbTemplate.queryForObject(sql, params, studentRowMapper);
 			return stud;
-		} catch(Exception e) {
-			logger.error("StudentDaoJdbcImpl getStudentDetails by id: "+ e.getMessage());
+		} catch (Exception e) {
+			logger.error("StudentDaoJdbcImpl getStudentDetails by id: " + e.getMessage());
 			throw e;
 		}
-		
+
 	}
 
 	@Override
 	public int removeStudentWithId(int studentId) throws Exception {
 		String sql = "delete from student where studentId=:studentId";
 		MapSqlParameterSource params = new MapSqlParameterSource("studentId", studentId);
-		int result = dbTemplate.update(sql, params);	
+		int result = dbTemplate.update(sql, params);
 		return result;
+	}
+
+	@Override
+	public Student getStudentWithPassword(int studentId) throws Exception {
+		Student stud = null;
+		try {
+			String sql = "select * from student where studentId=:studentId";
+			MapSqlParameterSource params = new MapSqlParameterSource("studentId", studentId);
+			stud = dbTemplate.queryForObject(sql, params, studentRowMapper);
+			return stud;
+		} catch (Exception e) {
+			logger.error("StudentDaoJdbcImpl getStudentWithPassword by id: " + e.getMessage());
+			throw e;
+		}
+	}
+
+	@Override
+	public float getStudentCGPA(int studentId) throws Exception {
+		try {
+
+			String sql = "select cgpa from Student where studentId=:studentId";
+			MapSqlParameterSource params = new MapSqlParameterSource("studentId", studentId);
+
+			return dbTemplate.queryForObject(sql, params, Float.class);
+
+		} catch (Exception e) {
+			logger.error("StudentDaoJdbcImpl getStudentCGPA by id: " + e.getMessage());
+			throw e;
+		}
+	}
+
+	@Override
+	public void updateStudentCGPA(int studentId, float cgpa) throws Exception {
+		try {
+			String sql = "update student set cgpa=:cgpa where studentId=:studentId";
+			MapSqlParameterSource params = new MapSqlParameterSource();
+			params.addValue("studentId", studentId);
+			params.addValue("cgpa", cgpa);
+			
+			dbTemplate.update(sql,params);
+			
+		} catch(Exception e) {
+			logger.error("StudentDaoJdbcImpl updateStudentCGPA: " + e.getMessage());
+			throw e;
+		}
+
+	}
+
+	@Override
+	public void updateRegisteredColumn(boolean registered) throws Exception {
+		try {
+			String sql = "update student set registered=:registered";
+			MapSqlParameterSource params = new MapSqlParameterSource("registered", registered);
+			dbTemplate.update(sql,params);
+			
+		} catch(Exception e) {
+			logger.error("StudentDaoJdbcImpl updateRegisteredColumn: " + e.getMessage());
+			throw e;
+		}
+		
 	}
 
 }

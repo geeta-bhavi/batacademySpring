@@ -8,7 +8,10 @@ import com.project.batacademy.domain.Course;
 import com.project.batacademy.domain.Faculty;
 
 public interface FacultyService {
-	public Faculty getFacultyDetails(int facultyId);
-	public List<Course> getCoursesTaughtByFaculty(int facultyId);
-	public int updateActivityScores(Activity activity, int facultyId);
+	public Faculty getFacultyDetails(int facultyId) throws Exception;
+	public Faculty getFacultyWithPassword(int facultyId) throws Exception;
+	public List<Course> getCoursesTaughtByFaculty(int facultyId) throws Exception;
+	public int updateActivityScores(Activity activity, int facultyId) throws Exception;
+	public void processEnableDisableRegistration() throws Exception;
+	public void updateEnableColumn(boolean enabled) throws Exception;
 }

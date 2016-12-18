@@ -37,7 +37,7 @@ $(function () {
     $("#searchStudentId").on("keypress", removeErrorClass); /* remove error when faculty starts typing again in the search form */
     $("#searchCourseId").on("keypress", removeErrorClass);/* remove error when faculty starts typing again in the search form */
     $("#updateActivity").on("submit", updateActivity); /* update activity scores after faculty confirms scores */
-    $("#enableReg").on("change", enableRegistrationForNewSem);/* president has checked enable button */
+    $("#enableReg").on("change", enableOrDisableRegistration);/* president has checked enable button */
     $("#searchByStudentId").on("submit", searchStudent); /* president searches student to delete student */
     $("#deleteStudent").on("click", deleteStudent);
     $("#batSignUp").on("submit", signUp); /* sign up*/
@@ -116,7 +116,7 @@ $(function () {
         $("#" + id).removeClass("hide").addClass("show");
         $("#" + id + " input[type='radio']").removeAttr("checked");
         quiz = setTimeout(function () {
-            window.location = '../BatAcademy/HandleError';
+            window.location = '../batacademy/handleError';
         }, 20000);
 
     }
@@ -133,7 +133,7 @@ $(function () {
             $("body").load("../BatAcademy/signup");
             $("body").removeClass("is-reveal-open");
         } else {
-            window.location = '../BatAcademy/HandleError';
+            window.location = '../batacademy/handleError';
         }
     }
 
@@ -335,7 +335,7 @@ $(function () {
     }
 
 
-    function enableRegistrationForNewSem() {
+    function enableOrDisableRegistration() {
 
         var checked = $(this).is(":checked");
 
@@ -344,10 +344,11 @@ $(function () {
         $("#presidentUpdateStatus").removeClass("success alert label");
 
         showLoadingScreen();
+        
         $.ajax({
             method: "POST",
-            url: "../BatAcademy/FacultyDetailsController",
-            data: {task: "enableRegistrationForNewSem", enable: checked}
+            url: "../batacademy/facultyDetailsController/enableOrDisableRegistration",
+            data: {enable: checked}
         }).done(function (data) {
             hideLoadingScreen();
             if (data === "success") {
