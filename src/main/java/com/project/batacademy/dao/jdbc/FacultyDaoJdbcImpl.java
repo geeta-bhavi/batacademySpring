@@ -1,5 +1,7 @@
 package com.project.batacademy.dao.jdbc;
 
+import java.util.List;
+
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
@@ -93,8 +95,44 @@ public class FacultyDaoJdbcImpl implements FacultyDao {
 		} catch(Exception e) {
 			logger.error("FacultyDaoJdbcImpl updateEnableColumn: " + e.getMessage());
 			throw e;
-		}
+		}		
+	}
+
+	@Override
+	public boolean isRegisterationEnabled() throws Exception {
 		
+		try {
+			String sql = "select enable from faculty where facultyId=1";
+			return jdbcTemplate.queryForObject(sql, Boolean.class);
+		} catch (Exception e) {
+			logger.error("FacultyDaoJdbcImpl isRegisterationEnabled" + e);
+			throw e;
+		}
+	}
+
+	@Override
+	public List<Faculty> getAllFaculty() throws Exception {
+		try {
+			String sql = "select * from faculty";
+			List<Faculty> facultyList =  jdbcTemplate.query(sql, facultyRowMapper);
+			return facultyList;
+		} catch (Exception e) {
+			logger.error("FacultyDaoJdbcImpl getAllFaculty " + e);
+			throw e;
+		}
+	}
+
+	@Override
+	public String getFacultyNameForAGivenCourseID(int courseId) throws Exception {
+		try {
+			String sql = "select F.firstName from course C, faculty F WHERE C.facultyId = F.facultyId and C.courseId=:courseId";
+			MapSqlParameterSource params = new MapSqlParameterSource("courseId", courseId);
+			String facultyName =  dbTemplate.queryForObject(sql, params, String.class);
+			return facultyName;
+		} catch (Exception e) {
+			logger.error("FacultyDaoJdbcImpl getFacultyNameForAGivenCourseID " + e);
+			throw e;
+		}
 	}
 
 }

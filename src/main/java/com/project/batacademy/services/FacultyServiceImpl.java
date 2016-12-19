@@ -1,5 +1,6 @@
 package com.project.batacademy.services;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import com.project.batacademy.dao.FacultyDao;
 import com.project.batacademy.domain.Activity;
 import com.project.batacademy.domain.Course;
 import com.project.batacademy.domain.Faculty;
+import com.project.batacademy.domain.RegisteredCourses;
 
 @Service("facultyServiceImpl")
 @Transactional(readOnly = true)
@@ -31,7 +33,7 @@ public class FacultyServiceImpl implements FacultyService {
 	@Autowired
 	@Qualifier("studentServiceImpl")
 	private StudentService studentService;
-	
+
 	@Autowired
 	@Qualifier("registeredCoursesServiceImpl")
 	private RegisteredCoursesService registeredCoursesService;
@@ -81,14 +83,19 @@ public class FacultyServiceImpl implements FacultyService {
 
 	@Override
 	@Transactional(readOnly = false)
-	public void processEnableDisableRegistration() throws Exception {
+	public void processEnableDisableRegistration(boolean enable) throws Exception {
 		/*
-		 * calculate cgpa, make completed column in RegisteredCourses as true
-		 * and Register column in Student table as false
+		 * calculate student's cgpa for the courses being completed, make
+		 * completed column in registeredCourses table as true and registered
+		 * column in student table as false
 		 */
-		studentService.updateAllStudentsGPA();
-		registeredCoursesService.updateCompletedColumn(true);
-		studentService.updateRegisteredColumn(false);
+		if (enable) {
+			studentService.updateAllStudentsGPA();
+			registeredCoursesService.updateCompletedColumn(true);
+			studentService.updateRegisteredColumn(false);
+		}
+		updateEnableColumn(enable);
+		
 
 	}
 
@@ -96,6 +103,27 @@ public class FacultyServiceImpl implements FacultyService {
 	@Transactional(readOnly = false)
 	public void updateEnableColumn(boolean enabled) throws Exception {
 		facultyDao.updateEnableColumn(enabled);
-		
+
+	}
+
+	@Override
+	public boolean isRegisterationEnabled() throws Exception {
+		return facultyDao.isRegisterationEnabled();
+	}
+
+	@Override
+	public HashMap<Integer, String> getFacultyName() throws Exception {
+		HashMap<Integer, String> facultyMap = new HashMap();
+        List<Faculty> facultyList = facultyDao.getAllFaculty();
+        facultyMap.clear();
+        for (Faculty faculty : facultyList) {
+            facultyMap.put(faculty.getFacultyId(), faculty.getFirstName());
+        }
+        return facultyMap;
+	}
+
+	@Override
+	public String getFacultyNameForAGivenCourseID(int courseId) throws Exception {
+		return facultyDao.getFacultyNameForAGivenCourseID(courseId);
 	}
 }

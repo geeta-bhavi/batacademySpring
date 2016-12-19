@@ -39,4 +39,9 @@ public class ActivityServiceImpl implements ActivityService {
 		return activityDao.getActivitiesOfNotCompletedCourses(notCompletedCourses);
 	}
 
+	@Override
+	public Activity getActivityforGiveCouseAndStudent(int courseId, int studentId) throws Exception {
+		return activityDao.getActivityforGiveCouseAndStudent(courseId, studentId);
+	}
+
 }

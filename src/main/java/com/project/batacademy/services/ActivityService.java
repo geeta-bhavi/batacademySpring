@@ -10,4 +10,5 @@ public interface ActivityService {
 	public int updateActivityScores(Activity activity, int facultyId) throws Exception;
 	public int insertActivity(Activity activity, int facultyId) throws Exception;
 	public List<Activity> getActivitiesOfNotCompletedCourses(List<RegisteredCoursesId> notCompletedCourses) throws Exception;
+	public Activity getActivityforGiveCouseAndStudent(int courseId, int studentId) throws Exception;
 }

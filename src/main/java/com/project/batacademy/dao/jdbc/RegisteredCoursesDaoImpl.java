@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -81,6 +82,54 @@ public class RegisteredCoursesDaoImpl implements RegisteredCoursesDao {
 			
 		} catch(Exception e) {
 			logger.error("RegisteredCoursesDaoImpl updateCompletedColumn: " + e.getMessage());
+			throw e;
+		}
+		
+	}
+
+	@Override
+	public List<Integer> getCoursesIdGivenStudentId(int studentId) throws Exception {
+		try {
+			String sql = "select courseId from registeredCourses where studentId=:studentId";
+			MapSqlParameterSource params = new MapSqlParameterSource("studentId", studentId);
+			List<Integer> listOfRegCoursesId = dbTemplate.queryForList(sql, params, Integer.class);
+			return listOfRegCoursesId;
+		} catch (Exception e) {
+			logger.error(
+					"RegisteredCoursesDaoImpl getCoursesIdGivenStudentId: " + e.getMessage());
+			throw e;
+		}
+	}
+
+	@Override
+	public List<RegisteredCourses> getRegisteredCoursesForStudent(int studentId) throws Exception {
+		try {
+			String sql = "select * from registeredCourses where studentId=:studentId";
+			MapSqlParameterSource params = new MapSqlParameterSource("studentId", studentId);
+			List<RegisteredCourses> listOfRegCourses = dbTemplate.query(sql, params, registeredCoursesRowMapper);
+			return listOfRegCourses;
+		} catch (Exception e) {
+			logger.error(
+					"RegisteredCoursesDaoImpl getRegisteredCoursesForStudent: " + e.getMessage());
+			throw e;
+		}
+	}
+
+	@Override
+	public void updateRegisteredCourses(List<RegisteredCourses> registeredCoursesList) throws Exception {
+		try {
+            for (RegisteredCourses selectedcourse : registeredCoursesList) {
+            	MapSqlParameterSource params = new MapSqlParameterSource();
+            	logger.error("dao registeredcourse: "+selectedcourse.getId().getCourseId());
+				params.addValue("courseId", selectedcourse.getId().getCourseId());
+				params.addValue("courseName", selectedcourse.getCourseName());
+				params.addValue("studentId", selectedcourse.getId().getStudentId());
+				params.addValue("completed", false);
+                jdbcInsert.execute(params);
+            }
+		} catch(Exception e) {
+			logger.error(
+					"RegisteredCoursesDaoImpl updateRegisteredCourses: " + e.getMessage());
 			throw e;
 		}
 		

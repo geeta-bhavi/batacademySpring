@@ -22,4 +22,9 @@ public class CourseServiceImpl implements CourseService {
 		return listOfCourses;
 	}
 
+	@Override
+	public List<Course> getRemainingCourses(List<Integer> coursesTaken) throws Exception {
+		return courseDao.getRemainingCourses(coursesTaken);
+	}
+
 }

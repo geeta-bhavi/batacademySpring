@@ -1,5 +1,6 @@
 package com.project.batacademy.dao.jdbc;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -14,7 +15,6 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.project.batacademy.dao.CourseDao;
 import com.project.batacademy.domain.Course;
@@ -47,6 +47,19 @@ public class CourseDaoJdbcImpl implements CourseDao {
 			return matchingCourses;
 		} catch (Exception e) {
 			logger.error("CourseDaoJdbcImpl getCoursesTaughtByFaculty by id: " + e.getMessage());
+			throw e;
+		}
+	}
+
+	@Override
+	public List<Course> getRemainingCourses(List<Integer> coursesTaken) throws Exception {
+		try {
+			String sql = "SELECT * FROM course WHERE courseId NOT IN (:coursesTaken)";
+			MapSqlParameterSource params = new MapSqlParameterSource("coursesTaken", coursesTaken);
+			List<Course> remainingCourses = dbTemplate.query(sql, params, courseRowMapper);
+			return remainingCourses;
+		} catch (Exception e) {
+			logger.error("CourseDaoJdbcImpl getRemainingCourses: " + e.getMessage());
 			throw e;
 		}
 	}

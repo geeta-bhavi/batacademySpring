@@ -34,4 +34,20 @@ public class RegisteredCoursesServiceImpl implements RegisteredCoursesService {
 		registeredCoursesDao.updateCompletedColumn(completed);
 	}
 
+	@Override
+	public List<Integer> getCoursesIdGivenStudentId(int studentId) throws Exception {
+		return registeredCoursesDao.getCoursesIdGivenStudentId(studentId);
+	}
+
+	@Override
+	public List<RegisteredCourses> getRegisteredCoursesForStudent(int studentId) throws Exception {
+		return registeredCoursesDao.getRegisteredCoursesForStudent(studentId);
+	}
+
+	@Override
+	public void updateRegisteredCourses(List<RegisteredCourses> registeredCoursesList) throws Exception {
+		registeredCoursesDao.updateRegisteredCourses(registeredCoursesList);
+		
+	}
+
 }

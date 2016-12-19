@@ -72,8 +72,8 @@ public class FacultyRestHandler {
 
 	/*
 	 * update activity scores of the student taught by the faculty To test, you
-	 * can PUT the activity as below: json: {"id": {"studentId": 1002,
-	 * "courseId": 13}, "a1": 100, "a2": 100, "a3": 100} xml:
+	 * can PUT the activity as below: json: {"id": {"studentId":
+	 * 1002,"courseId": 13}, "a1": 100, "a2": 100, "a3": 100} xml:
 	 * <activity><id><studentId>1002</studentId><courseId>13</courseId></id><a1>
 	 * 100</a1><a2>100</a2><a3>100</a3></activity> URL:
 	 * http://localhost:8080/batacademy/webservices/facultyrest/faculty/{
@@ -95,9 +95,37 @@ public class FacultyRestHandler {
 			respBuilder = Response.status(Status.CREATED);
 			respBuilder.entity(activity);
 			return respBuilder.build();
-		} catch(Exception e) {
-			throw new UnknownResourceException("no rows were updated");
+		} catch (Exception e) {
+			throw new UnknownResourceException("No rows were updated");
 		}
+	}
+
+	/*
+	 * president (only president can do it, no other faculty) enables/disables
+	 * registration URL:
+	 * http://localhost:8080/batacademy/webservices/facultyrest/registration/{
+	 * enabled}
+	 */
+	@PUT
+	@Path("/faculty/registration/{enabled}")
+	public Response enableDisableRegistration(@PathParam("enabled") boolean enabled,
+			@HeaderParam("Authorization") String auth) {
+
+		ResponseBuilder respBuilder;
+
+		/* Authorize the user, before proceeding */
+		int facultyId = 1; /* faculty id is 1 for President */
+		lookupFacultyWithAuth(facultyId, auth);
+
+		try {
+			facultyService.processEnableDisableRegistration(enabled);
+			logger.info("Successfully updated faculty's enable column:");
+			respBuilder = Response.ok();
+			return respBuilder.build();
+		} catch (Exception e) {
+			throw new UnknownResourceException("Registration not enabled/disabled");
+		}
+
 	}
 
 	/* Only return the faculty if the authentication information is correct */

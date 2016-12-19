@@ -126,11 +126,11 @@ $(function () {
         var radioValue = $("input[name='" + id + "']:checked").val();
         if (id === "bat1" && radioValue === "3") {
             clearTimeout(quiz);
-            $("body").load("../BatAcademy/signup");
+            $("body").load("../batacademy/signupForm");
             $("body").removeClass("is-reveal-open");
         } else if (id === "bat2" && radioValue === "42") {
             clearTimeout(quiz);
-            $("body").load("../BatAcademy/signup");
+            $("body").load("../batacademy/signupForm");
             $("body").removeClass("is-reveal-open");
         } else {
             window.location = '../batacademy/handleError';
@@ -165,7 +165,7 @@ $(function () {
             var list = [];
             var courses = {
                 "studentId": $("#studentId").html(),
-                "courseList": []
+                "courseList": {}
             };
 
             $.each(tr, function (key, value) {
@@ -192,12 +192,15 @@ $(function () {
 
 
             courses.courseList = list;
+            
+            console.log(courses);
 
 
             $.ajax({
                 method: "POST",
-                url: "../BatAcademy/StudentDetailsController",
-                data: {courses: JSON.stringify(courses)}
+                url: "../batacademy/studentDetailsController/register",
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(courses)
             }).done(function (data) {
                 hideLoadingScreen();
                 if (data === "success") {
@@ -504,13 +507,22 @@ $(function () {
             showError("Enter phone number", "errorSignUp");
             $("#phno").addClass("error");
         }
-
+        
+        var student = {
+        		"firstName" : firstName,
+        		"lastName" : lastName,
+        		"password": password,
+        		"phone": phno,
+        		"gender": gender
+        }
+        
         if (firstName.length !== 0 && password.length !== 0 && cpwd === password && phno.length !== 0) {
             showLoadingScreen();
             $.ajax({
                 method: "POST",
-                url: "../BatAcademy/signin",
-                data: {task: "signup", firstName: firstName, lastName: lastName, password: password, phno: phno, gender: gender}
+                url: "../batacademy/signup",
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(student)
             }).done(function (data) {
                 hideLoadingScreen();
                 if (data !== 0) {

@@ -170,9 +170,9 @@ public class FacultyDetailsController {
 		String enabled = "error";
 		
 		try {
-			if (enable) {
-				facultyService.processEnableDisableRegistration();
-			}
+				
+			facultyService.processEnableDisableRegistration(enable);
+			
 			facultyService.updateEnableColumn(enable);
 			enabled = "success";
 			

@@ -24,7 +24,7 @@
                 </div>
             </header>
 
-            <div class="large-text-center medium-text-center">
+            <div class="large-12 columns large-text-center medium-text-center">
                 <!-- img src="${context}/resources/images/error.png"> -->
                 <div>${message}</div>
             </div>

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -128,6 +129,34 @@ public class StudentDaoJdbcImpl implements StudentDao {
 			
 		} catch(Exception e) {
 			logger.error("StudentDaoJdbcImpl updateRegisteredColumn: " + e.getMessage());
+			throw e;
+		}
+		
+	}
+
+	@Override
+	public int addStudent(Student student) throws Exception {
+		try {
+			BeanPropertySqlParameterSource params = new BeanPropertySqlParameterSource(student);
+			Number id = jdbcInsert.executeAndReturnKey(params);
+			int studentId = id.intValue();
+			return studentId;
+			
+		} catch(Exception e) {
+			logger.error("StudentDaoJdbcImpl addStudent: " + e.getMessage());
+			throw e;
+		}
+	}
+
+	@Override
+	public void setRegisteredTrue(int studentId) throws Exception {
+		try {
+			String sql = "update student set registered=true where studentId=:studentId";
+			MapSqlParameterSource params = new MapSqlParameterSource("studentId", studentId);
+			dbTemplate.update(sql,params);
+			
+		} catch(Exception e) {
+			logger.error("StudentDaoJdbcImpl setRegisteredTrue: " + e.getMessage());
 			throw e;
 		}
 		

@@ -1,5 +1,6 @@
 package com.project.batacademy.services;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,8 +16,10 @@ import com.project.batacademy.dao.StudentDao;
 import com.project.batacademy.domain.Activity;
 import com.project.batacademy.domain.ActivityCompletion;
 import com.project.batacademy.domain.ActivityId;
+import com.project.batacademy.domain.Course;
 import com.project.batacademy.domain.RegisteredCourses;
 import com.project.batacademy.domain.RegisteredCoursesId;
+import com.project.batacademy.domain.SelectedCoursesBean;
 import com.project.batacademy.domain.Student;
 
 @Service("studentServiceImpl")
@@ -35,6 +38,14 @@ public class StudentServiceImpl implements StudentService {
 	@Autowired
 	@Qualifier("registeredCoursesServiceImpl")
 	private RegisteredCoursesService registeredCoursesService;
+
+	@Autowired
+	@Qualifier("courseServiceImpl")
+	private CourseService courseService;
+
+	@Autowired
+	@Qualifier("facultyServiceImpl")
+	private FacultyService facultyService;
 
 	public Student getStudentDetails(int studentId) throws Exception {
 		Student student = (Student) studentDao.getStudentDetails(studentId);
@@ -153,25 +164,90 @@ public class StudentServiceImpl implements StudentService {
 		}
 
 	}
-	
+
 	private float getStudentCGPA(int studentId) throws Exception {
-        float cgpa = studentDao.getStudentCGPA(studentId);
-        return cgpa;
-    }
-	
+		float cgpa = studentDao.getStudentCGPA(studentId);
+		return cgpa;
+	}
+
 	@Transactional(readOnly = false)
-    private void updateStudentCGPA(int studentId, float cgpa) throws Exception {
-    	studentDao.updateStudentCGPA(studentId, cgpa);
-    }
+	private void updateStudentCGPA(int studentId, float cgpa) throws Exception {
+		studentDao.updateStudentCGPA(studentId, cgpa);
+	}
 
 	@Override
 	@Transactional(readOnly = false)
 	public void updateRegisteredColumn(boolean registered) throws Exception {
 		studentDao.updateRegisteredColumn(registered);
 	}
-	
+
 	private static boolean isBetween(float x, float lower, float upper) {
 		return lower <= x && x <= upper;
+	}
+
+	@Override
+	@Transactional(readOnly = false)
+	public int addStudent(Student student) throws Exception {
+		return studentDao.addStudent(student);
+	}
+
+	@Override
+	public List<Course> getRemainingCourses(int studentId) throws Exception {
+		List<Integer> coursesTaken = registeredCoursesService.getCoursesIdGivenStudentId(studentId);
+		if (coursesTaken.size() <= 0) {
+			coursesTaken = new ArrayList<Integer>();
+			coursesTaken.add(0);
+		}
+		logger.info("courses taken by student: " + coursesTaken);
+		List<Course> courses = courseService.getRemainingCourses(coursesTaken);
+		logger.info("remaining courses: " + courses);
+		return courses;
+	}
+
+	@Override
+	public List<SelectedCoursesBean> getRegisteredCourses(int studentId) throws Exception {
+		List<RegisteredCourses> registeredCourses = registeredCoursesService.getRegisteredCoursesForStudent(studentId);
+
+		ArrayList<SelectedCoursesBean> selectedCourses = new ArrayList<SelectedCoursesBean>();
+		for (RegisteredCourses registeredCourse : registeredCourses) {
+			int courseId = registeredCourse.getId().getCourseId();
+
+			Activity activityObj = (Activity) activityService.getActivityforGiveCouseAndStudent(courseId, studentId);
+
+			SelectedCoursesBean selectedCourse = new SelectedCoursesBean();
+			selectedCourse.setCourseID(registeredCourse.getId().getCourseId());
+			selectedCourse.setCourseName(registeredCourse.getCourseName());
+			selectedCourse.setCompleted(registeredCourse.isCompleted());
+			selectedCourse.setFacultyName(facultyService.getFacultyNameForAGivenCourseID(courseId));
+
+			if (null != activityObj) {
+				selectedCourse.setA1(activityObj.getA1());
+				selectedCourse.setA2(activityObj.getA2());
+				selectedCourse.setA3(activityObj.getA3());
+			} else {
+				selectedCourse.setA1(0);
+				selectedCourse.setA2(0);
+				selectedCourse.setA3(0);
+			}
+
+			selectedCourses.add(selectedCourse);
+		}
+
+		return selectedCourses;
+	}
+
+	@Override
+	@Transactional(readOnly = false)
+	public void updateRegisteredCourses(List<RegisteredCourses> registeredCoursesList) throws Exception {
+
+		registeredCoursesService.updateRegisteredCourses(registeredCoursesList);
+
+	}
+
+	@Override
+	@Transactional(readOnly = false)
+	public void setRegisteredTrue(int studentId) throws Exception {
+		studentDao.setRegisteredTrue(studentId);
 	}
 
 }

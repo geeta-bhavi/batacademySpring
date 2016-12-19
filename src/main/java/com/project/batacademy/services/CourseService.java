@@ -6,4 +6,5 @@ import com.project.batacademy.domain.Course;
 
 public interface CourseService {
 	public List<Course> getCoursesTaughtByFaculty(int facultyId) throws Exception;
+	public List<Course> getRemainingCourses(List<Integer> coursesTaken) throws Exception;
 }

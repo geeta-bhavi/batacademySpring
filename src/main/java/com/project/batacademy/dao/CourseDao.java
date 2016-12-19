@@ -5,6 +5,8 @@ import java.util.List;
 import com.project.batacademy.domain.Course;
 
 public interface CourseDao {
-	
+
 	public List<Course> getCoursesTaughtByFaculty(int facultyId) throws Exception;
+
+	public List<Course> getRemainingCourses(List<Integer> coursesTaken) throws Exception;
 }

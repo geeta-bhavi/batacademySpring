@@ -22,6 +22,7 @@ public class StudentRowMapper implements RowMapper<Student> {
 		stud.setGender(resultSet.getString("gender"));
 		stud.setPhone(resultSet.getString("phone"));
 		stud.setRegistered(resultSet.getBoolean("registered"));
+		stud.setCgpa(resultSet.getFloat("cgpa"));
 		try {
 			password = resultSet.getString("password");
 		} catch (SQLException e) {

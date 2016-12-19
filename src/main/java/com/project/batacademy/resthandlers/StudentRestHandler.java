@@ -1,7 +1,9 @@
 package com.project.batacademy.resthandlers;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -85,9 +87,32 @@ public class StudentRestHandler {
 		} catch (Exception e) {
 			respBuilder = Response.status(Status.NOT_FOUND);
 		}
-
 		return respBuilder.build();
-
+	}
+	
+	/*
+	 * Test Url: Use HTTP POST command
+	 * http://localhost:8080/batacademy/webservices/studrest/student
+	 * xml: <student><firstName>Bob</firstName><lastName>Watson</lastName><password>Bobwat123$</password><phone>111-111-1111</phone><gender>M</gender></student>
+	 * json: {"firstName": "Geeta", "lastName": "Bhavi", "password": "Geeta123$", "phone": "000-000-0000", "gender": "F"}
+	 */
+	@POST
+	@Path("/student")
+	@Consumes("application/json, application/xml")
+	@Produces("application/json, application/xml")
+	public Response addStudent(Student student) {
+		ResponseBuilder respBuilder = null;
+		try {
+			Number id = studentService.addStudent(student);
+			int studentId = id.intValue();
+			student.setStudentId(studentId);
+			logger.info("new student added " + id);
+			respBuilder = Response.ok();
+			respBuilder.entity(student);
+		} catch (Exception e) {
+			respBuilder = Response.status(Status.BAD_REQUEST);
+		}
+		return respBuilder.build();
 	}
 
 	/* get all courses taken by student */

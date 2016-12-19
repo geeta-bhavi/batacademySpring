@@ -7,12 +7,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.project.batacademy.domain.Student;
 import com.project.batacademy.services.AuthenticateService;
 import com.project.batacademy.services.AuthenticateServiceImpl;
+import com.project.batacademy.services.StudentService;
 
 @Controller
 public class SignInController {
@@ -20,6 +23,10 @@ public class SignInController {
 	@Autowired
 	@Qualifier("authServiceImpl")
 	private AuthenticateService auth;
+
+	@Autowired
+	@Qualifier("studentServiceImpl")
+	StudentService studentservice;
 
 	@RequestMapping(value = "/signin", method = RequestMethod.POST)
 	@ResponseBody
@@ -71,6 +78,25 @@ public class SignInController {
 		}
 
 		return "success";
+	}
+
+	@RequestMapping(value = "/signupForm", method = RequestMethod.GET)
+	public String signUpForm() {
+		return "signup";
+	}
+
+	@RequestMapping(value = "/signup", method = RequestMethod.POST, consumes = { "application/json",
+			"application/xml" })
+	@ResponseBody
+	public int signup(@RequestBody Student student) {
+		int id = 0;
+		try {
+			id = studentservice.addStudent(student);
+		} catch (Exception e) {
+
+		}
+
+		return id;
 	}
 
 }

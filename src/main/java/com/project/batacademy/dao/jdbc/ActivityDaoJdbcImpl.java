@@ -130,6 +130,19 @@ public class ActivityDaoJdbcImpl implements ActivityDao {
 		}
 
 	}
+	
+	private Activity getActivityForStudentAndCourse(int studentId, int courseId) {
+		String sql = "Select * from activity where studentId=:studentId and courseId=:courseId";
+		MapSqlParameterSource params = new MapSqlParameterSource();
+		params.addValue("studentId", studentId);
+		params.addValue("courseId", courseId);
+		List<Activity> activity = dbTemplate.query(sql, params, activityRowMapper);
+		if (activity != null && !activity.isEmpty()) {
+			return activity.get(0);
+		} else {
+			return null;
+		}
+	}
 
 	@Override
 	public List<Activity> getActivitiesOfNotCompletedCourses(List<RegisteredCoursesId> notCompletedCourses)
@@ -138,11 +151,9 @@ public class ActivityDaoJdbcImpl implements ActivityDao {
 		try{
 			
 			for (RegisteredCoursesId regCourse : notCompletedCourses) {
-				String sql = "Select * from activity where studentId=:studentId and courseId=:courseId";
-				MapSqlParameterSource params = new MapSqlParameterSource();
-				params.addValue("studentId", regCourse.getStudentId());
-				params.addValue("courseId", regCourse.getCourseId());
-				Activity activity = (Activity) dbTemplate.queryForObject(sql, params, activityRowMapper);
+				int studentId = regCourse.getStudentId();
+				int courseId = regCourse.getCourseId();
+				Activity activity = getActivityForStudentAndCourse(studentId, courseId);
 				activities.add(activity);
 
 			}
@@ -153,6 +164,16 @@ public class ActivityDaoJdbcImpl implements ActivityDao {
 		}
 		
 		return activities;
+	}
+
+	@Override
+	public Activity getActivityforGiveCouseAndStudent(int courseId, int studentId) throws Exception {
+		try {
+			return getActivityForStudentAndCourse(studentId, courseId);
+		} catch(Exception e) {
+			logger.error("ActivityDaoJdbcImpl getActivityforGiveCouseAndStudent " + e.getMessage());
+			throw e;
+		}
 	}
 
 }

@@ -15,4 +15,6 @@ public interface ActivityDao {
 
 	public List<Activity> getActivitiesOfNotCompletedCourses(List<RegisteredCoursesId> notCompletedCourses)
 			throws Exception;
+
+	public Activity getActivityforGiveCouseAndStudent(int courseId, int studentId) throws Exception;
 }
